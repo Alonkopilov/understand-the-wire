@@ -1,4 +1,4 @@
 variable "budget_alert_email" {
-  type = string
+  type        = string
   description = "Email to send budget alerts to"
 }

@@ -5,6 +5,14 @@ terraform {
       version = "~> 6.0"
     }
   }
+
+  backend "s3" {
+    bucket       = "alonko-state-bucket"
+    key          = "root"
+    use_lockfile = true
+    region       = "eu-central-1"
+    profile      = "personal"
+  }
 }
 
 provider "aws" {
