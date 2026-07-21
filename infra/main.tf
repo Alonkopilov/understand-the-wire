@@ -29,3 +29,8 @@ output "aws_account" {
 module "network" {
   source = "./network"
 }
+
+module "ec2" {
+  source            = "./ec2"
+  private_subnet_id = module.network.output_private_subnet_1
+}

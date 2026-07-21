@@ -6,7 +6,7 @@ resource "aws_route_table" "rtb_public" {
     gateway_id = aws_internet_gateway.gw.id
   }
 
-  depends_on = aws_internet_gateway.gw
+  depends_on = [aws_internet_gateway.gw]
 
   tags = {
     managed_by = "Terraform"
