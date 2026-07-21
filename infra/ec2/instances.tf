@@ -46,12 +46,12 @@ resource "aws_instance" "worker" {
   instance_type        = "t3.micro"
   iam_instance_profile = aws_iam_instance_profile.worker_instance_profile.name
 
-  #   instance_market_options {
-  #     market_type = "spot"
-  #     spot_options {
-  #       max_price = 0.01
-  #     }
-  #   }
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = 0.01
+    }
+  }
 
   primary_network_interface {
     network_interface_id = aws_network_interface.worker_instance_private_subnet_1.id
