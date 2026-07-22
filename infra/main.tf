@@ -31,6 +31,11 @@ module "network" {
 }
 
 module "ec2" {
-  source            = "./ec2"
-  private_subnet_id = module.network.output_private_subnet_1
+  source                = "./ec2"
+  private_subnet_id     = module.network.output_private_subnet_1
+  public_subnet_id      = module.network.output_public_subnet_1
+  alb_sg                = module.network.output_alb_sg
+  vpc_id                = module.network.output_vpc
+  load_balancer_subnets = module.network.output_load_balancer_subnets
+  private_ec2_sg        = module.network.output_private_ec2_sg
 }

@@ -18,6 +18,11 @@ resource "aws_route_table_association" "rtb_to_public_subnet_1" {
   route_table_id = aws_route_table.rtb_public.id
 }
 
+resource "aws_route_table_association" "rtb_to_public_subnet_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.rtb_public.id
+}
+
 resource "aws_route_table" "rtb_private" {
   vpc_id = aws_vpc.main.id
 

@@ -7,7 +7,7 @@ resource "aws_vpc_endpoint" "ssm_messages_endpoint" {
   subnet_ids = [aws_subnet.private_subnet_1.id]
 
   security_group_ids = [
-    aws_security_group.allow_inbound_https_vpc_endpoint.id
+    aws_security_group.vpc_endpoint_sg.id
   ]
 }
 
@@ -20,7 +20,7 @@ resource "aws_vpc_endpoint" "ssm_endpoint" {
   subnet_ids = [aws_subnet.private_subnet_1.id]
 
   security_group_ids = [
-    aws_security_group.allow_inbound_https_vpc_endpoint.id
+    aws_security_group.vpc_endpoint_sg.id
   ]
 }
 
@@ -33,6 +33,6 @@ resource "aws_vpc_endpoint" "ec2_messages_endpoint" {
   subnet_ids = [aws_subnet.private_subnet_1.id]
 
   security_group_ids = [
-    aws_security_group.allow_inbound_https_vpc_endpoint.id
+    aws_security_group.vpc_endpoint_sg.id
   ]
 }
