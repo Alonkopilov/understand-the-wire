@@ -38,4 +38,11 @@ module "ec2" {
   vpc_id                = module.network.output_vpc
   load_balancer_subnets = module.network.output_load_balancer_subnets
   private_ec2_sg        = module.network.output_private_ec2_sg
+  tls_certificate       = module.acm.output_certificate_arn
+}
+
+module "acm" {
+  source = "./acm"
+
+  full_domain = var.full_domain
 }

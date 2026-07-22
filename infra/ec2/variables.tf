@@ -21,3 +21,7 @@ variable "load_balancer_subnets" {
 variable "private_ec2_sg" {
   type = string
 }
+
+variable "tls_certificate" {
+  type = string
+}
