@@ -1,3 +1,13 @@
+locals {
+  vpc_cidr = "10.50.0.0/16"
+
+  private_subnet_1_cidr = "10.50.1.0/24"
+  public_subnet_1_cidr = "10.50.2.0/24"
+
+  private_subnet_2_cidr = "10.50.3.0/24"
+  public_subnet_2_cidr = "10.50.4.0/24"
+}
+
 terraform {
   required_providers {
     aws = {
@@ -28,6 +38,12 @@ output "aws_account" {
 
 module "network" {
   source = "./network"
+
+  vpc_cidr = local.vpc_cidr
+  private_subnet_1_cidr = local.private_subnet_1_cidr
+  public_subnet_1_cidr = local.public_subnet_1_cidr
+  private_subnet_2_cidr = local.private_subnet_2_cidr
+  public_subnet_2_cidr = local.public_subnet_2_cidr
 }
 
 module "ec2" {
