@@ -4,6 +4,7 @@ metadata:
   name: deployment
   namespace: understand-the-wire
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: frontend
