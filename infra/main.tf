@@ -55,6 +55,7 @@ module "ec2" {
   load_balancer_subnets = module.network.output_load_balancer_subnets
   private_ec2_sg        = module.network.output_private_ec2_sg
   tls_certificate       = module.acm.output_certificate_arn
+  github_token_arn      = module.ssm.output_github_token_arn
 }
 
 module "acm" {
@@ -71,4 +72,10 @@ module "cloudflare" {
   api_token       = var.api_token
   alb_dns_name    = module.ec2.alb_dns_name
   acm_certificate = module.acm.output_certificate
+}
+
+module "ssm" {
+  source = "./ssm"
+
+  github_token = var.github_token
 }

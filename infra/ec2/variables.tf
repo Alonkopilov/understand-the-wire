@@ -25,3 +25,7 @@ variable "private_ec2_sg" {
 variable "tls_certificate" {
   type = string
 }
+
+variable "github_token_arn" {
+  type = string
+}

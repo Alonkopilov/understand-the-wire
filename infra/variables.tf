@@ -17,3 +17,8 @@ variable "api_token" {
   type      = string
   sensitive = true
 }
+
+variable "github_token" {
+  type      = string
+  sensitive = true
+}
