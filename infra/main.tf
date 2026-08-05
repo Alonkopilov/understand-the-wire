@@ -56,6 +56,11 @@ module "ec2" {
   private_ec2_sg        = module.network.output_private_ec2_sg
   tls_certificate       = module.acm.output_certificate_arn
   github_token_arn      = module.ssm.output_github_token_arn
+  user_data = templatefile("${path.module}/scripts/init-instance.sh.tpl", {
+    repo_owner = var.repo_owner
+    repo_name  = var.repo_name
+    branch     = var.branch
+  })
 }
 
 module "acm" {

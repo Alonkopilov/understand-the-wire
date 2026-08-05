@@ -29,3 +29,7 @@ variable "tls_certificate" {
 variable "github_token_arn" {
   type = string
 }
+
+variable "user_data" {
+  type = string
+}

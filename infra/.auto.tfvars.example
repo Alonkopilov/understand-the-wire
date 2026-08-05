@@ -6,3 +6,6 @@ api_token = "..."
 
 // Github
 github_token = "..."
+repo_owner = "..."
+repo_name = "..."
+branch = "..."

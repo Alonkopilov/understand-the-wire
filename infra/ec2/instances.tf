@@ -81,6 +81,8 @@ resource "aws_instance" "worker" {
     network_interface_id = aws_network_interface.worker_instance_private_subnet_1.id
   }
 
+  user_data = var.user_data
+
   tags = {
     managed_by : "Terraform"
   }
