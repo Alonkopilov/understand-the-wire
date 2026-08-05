@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: www.kopilov.me
+  - host: www.understand-the-wire.com
     http:
       paths:
       - pathType: Prefix
