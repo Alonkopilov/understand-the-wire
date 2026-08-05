@@ -2,13 +2,12 @@
 set -euxo pipefail
 
 # Set up Kubernetes with K3S
-curl -sfL https://get.k3s.io | \
-  INSTALL_K3S_EXEC="--write-kubeconfig-mode=644" \
-  sh -
+export INSTALL_K3S_EXEC="--write-kubeconfig-mode=644"
+curl -sfL https://get.k3s.io | sh -
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-until kubectl get nodes >/dev/null 2>&1; do
+until /usr/local/bin/kubectl get nodes >/dev/null 2>&1; do
     echo "Waiting for Kubernetes..."
     sleep 5
 done
