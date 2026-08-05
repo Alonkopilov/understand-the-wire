@@ -1,1 +1,4 @@
-full_domain = "www.abc.com"
+account_id = "..."
+domain = "www.example.com"
+zone_id = "..."
+api_token = "..."

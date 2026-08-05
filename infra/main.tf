@@ -2,10 +2,10 @@ locals {
   vpc_cidr = "10.50.0.0/16"
 
   private_subnet_1_cidr = "10.50.1.0/24"
-  public_subnet_1_cidr = "10.50.2.0/24"
+  public_subnet_1_cidr  = "10.50.2.0/24"
 
   private_subnet_2_cidr = "10.50.3.0/24"
-  public_subnet_2_cidr = "10.50.4.0/24"
+  public_subnet_2_cidr  = "10.50.4.0/24"
 }
 
 terraform {
@@ -39,11 +39,11 @@ output "aws_account" {
 module "network" {
   source = "./network"
 
-  vpc_cidr = local.vpc_cidr
+  vpc_cidr              = local.vpc_cidr
   private_subnet_1_cidr = local.private_subnet_1_cidr
-  public_subnet_1_cidr = local.public_subnet_1_cidr
+  public_subnet_1_cidr  = local.public_subnet_1_cidr
   private_subnet_2_cidr = local.private_subnet_2_cidr
-  public_subnet_2_cidr = local.public_subnet_2_cidr
+  public_subnet_2_cidr  = local.public_subnet_2_cidr
 }
 
 module "ec2" {
@@ -60,5 +60,15 @@ module "ec2" {
 module "acm" {
   source = "./acm"
 
-  full_domain = var.full_domain
+  full_domain        = var.domain
+  validation_records = module.cloudflare.output_validation_records
+}
+
+module "cloudflare" {
+  source          = "./cloudflare"
+  account_id      = var.account_id
+  zone_id         = var.zone_id
+  api_token       = var.api_token
+  alb_dns_name    = module.ec2.alb_dns_name
+  acm_certificate = module.acm.output_certificate
 }
