@@ -67,7 +67,7 @@ resource "aws_iam_instance_profile" "worker_instance_profile" {
 
 resource "aws_instance" "worker" {
   ami                  = data.aws_ami.worker_instance.id
-  instance_type        = "t3.small"
+  instance_type        = "m7i-flex.large"
   iam_instance_profile = aws_iam_instance_profile.worker_instance_profile.name
 
   # instance_market_options {

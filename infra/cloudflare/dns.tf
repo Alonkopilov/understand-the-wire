@@ -21,3 +21,13 @@ resource "cloudflare_dns_record" "alb" {
   proxied = false
   ttl     = 60
 }
+
+resource "cloudflare_dns_record" "alb_grafana" {
+  zone_id = var.zone_id
+
+  name    = "grafana"
+  type    = "CNAME"
+  content = var.alb_dns_name
+  proxied = false
+  ttl     = 60
+}
