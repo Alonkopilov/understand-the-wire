@@ -93,7 +93,4 @@ resource "aws_network_interface" "worker_instance_private_subnet_1" {
   description     = "Connecting the worker instance to the private subnet"
   private_ips     = ["10.50.1.10"]
   security_groups = [var.private_ec2_sg]
-  tags = {
-    managed_by = "Terraform"
-  }
 }
