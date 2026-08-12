@@ -20,6 +20,7 @@ terraform {
     bucket       = "alonko-state-bucket"
     key          = "root"
     use_lockfile = true
+    encrypt      = true
     region       = "eu-central-1"
     profile      = "personal"
   }
