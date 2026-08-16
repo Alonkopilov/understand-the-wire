@@ -64,12 +64,12 @@ module "ec2" {
   tls_certificate       = module.acm.output_certificate_arn
   github_token_arn      = module.ssm.output_github_token_arn
   user_data = templatefile("${path.module}/scripts/init-instance.sh.tpl", {
-    repo_owner = var.repo_owner
-    repo_name  = var.repo_name
-    branch     = var.branch
+    oidc_bucket_name = "understand-the-wire-oidc-bucket"
+    oidc_bucket_url  = "https://understand-the-wire-oidc-bucket.s3.eu-central-1.amazonaws.com"
+    repo_owner       = var.repo_owner
+    repo_name        = var.repo_name
+    branch           = var.branch
   })
-
-  depends_on = [module.acm]
 }
 
 module "acm" {
@@ -92,4 +92,14 @@ module "ssm" {
   source = "./ssm"
 
   github_token = var.github_token
+}
+
+module "s3" {
+  source = "./s3"
+}
+
+module "iam" {
+  source = "./iam"
+
+  oidc_provider_arn = module.s3.output_cluster_oidc_provider_arn
 }
