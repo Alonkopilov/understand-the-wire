@@ -3,5 +3,7 @@ kind: Kustomization
 
 resources:
 - frontend
+- secrets
 - ns.yaml
 - health.yaml
+- external-secrets.yaml

@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
 - helm-prometheus-community.yaml
+- helm-external-secrets.yaml
