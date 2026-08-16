@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "oidc-bucket" {
   bucket = "understand-the-wire-oidc-bucket"
+  force_destroy = true
 
   tags = {
     Name = "OIDC signature verification files bucket"
