@@ -21,6 +21,32 @@ I created VPC endpoints to allow internal connection between AWS and my instance
 
 **How did I solve it? -** I analyzed both options. In a mature multi-node cluster, you can add mechanisms to request a new instance whenever you get an alert for instance termination, but in this project I set up everything from scratch with (as of writing) single node to minimize costs. The cost of using an on-demand instance is manageable compared to getting unexpected interruptions.
 
+---
+
+### GitOps Kubernetes directory structure
+
+**What happened? -** When dealing with FluxCD and Kubernetes manifests, sometimes I needed specific ordering to what Flux will apply first or there would have been errors.
+
+**What it looked like? -** Flux reconciliation error messages
+
+**What it turned out to be? -** Some manifests I have use CRDs installed via Helm charts. I had nothing to enforce apply order, so I got 'kind: X' does not exist errors.  
+
+**How did I solve it? -** I read about Flux's Kustomization files that help enforce this. After adding them I realized my entire directory structure is not intuitive enough and messy for adding Flux apply ordering. I revamped the directory structure according to best practices:
+- `clusters/` - Flux related manifests only
+- `infrastructure/controllers/` - Helm Repositories and releases
+- `infrastructure/configs` - cluster wide configurations (depends on controllers)
+- `apps/` - Regular services (depends on configs)
+
+---
+
+### Flux Kustomization vs Kustomize Kustomization
+
+**What happened? -** I had Flux reconciliation errors that seemed random.
+
+**What it turned out to be? -** I have Kustomize Kustomization.yaml files referencing a directory that was also referenced in a Flux Kustomization resource - which is not correct. 
+
+**How did I solve it? -** The intended behavior is that if a Flux Kustomization resource references a folder, it executes `kustomize build` in the background for it, so having a `Kustomization.yaml` reference it created double referencing that broke the apply order.
+
 
 <!-- ### Dealing with Spot instances
 **What happened? -** 
