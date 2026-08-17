@@ -34,7 +34,9 @@ kube-apiserver-arg:
 EOF
 
 # Install K3S
-curl -sfL https://get.k3s.io -o /tmp/install-k3s.sh
+curl --retry 10 --retry-delay 5 --retry-all-errors \
+    -fL https://get.k3s.io \
+    -o /tmp/install-k3s.sh
 bash -x /tmp/install-k3s.sh
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml

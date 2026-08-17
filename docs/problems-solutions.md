@@ -1,6 +1,6 @@
 ## Unexpected Problems and bugs I faced - with solutions 
 
-### Unexpected AWS SSM Agent not working
+### AWS SSM Agent not working
 **What happened? -** I wanted a way to connect to my EC2 worker nodes, while considering good security practices. I didn't want to open port 22 to the world for ssh as commonly done, so I decided to use the **AWS SSM Session Manager**.
 I created VPC endpoints to allow internal connection between AWS and my instance, and it just didn't work in the beginning.
 

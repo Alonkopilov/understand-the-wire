@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
 - monitoring
 - sources
-- external-secrets
+# - external-secrets
