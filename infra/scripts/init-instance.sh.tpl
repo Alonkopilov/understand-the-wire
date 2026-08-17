@@ -90,5 +90,5 @@ flux bootstrap github \
   --owner=$REPO_OWNER \
   --repository=$REPO_NAME \
   --branch=$BRANCH \
-  --path=./k8s \
+  --path=./k8s/clusters/production \
   --personal
