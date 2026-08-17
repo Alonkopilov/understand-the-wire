@@ -1,9 +1,21 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: flux-system
+spec:
+  interval: 12h
+  url: https://prometheus-community.github.io/helm-charts
+
+---
+
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
-  namespace: monitoring
+  namespace: flux-system
 spec:
+  targetNamespace: monitoring
   interval: 15m
   chart:
     spec:
@@ -47,5 +59,8 @@ spec:
         size: 10Gi
       ingress:
         enabled: true
+        ingressClassName: traefik
         hosts:
           - grafana.understand-the-wire.com
+        path: /
+        pathType: Prefix

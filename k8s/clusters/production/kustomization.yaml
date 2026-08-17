@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
 - flux-system
-- understand-the-wire
-- infrastructure
+- infrastructure-controllers.yaml
+- infrastructure-configs.yaml
+- apps.yaml
