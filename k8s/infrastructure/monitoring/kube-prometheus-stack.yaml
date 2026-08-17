@@ -38,7 +38,10 @@ spec:
     # Grafana configuration
     grafana:
       enabled: true
-      adminPassword: "12345678"
+      admin:
+        existingSecret: grafana
+        userKey: username
+        passwordKey: password
       persistence:
         enabled: true
         size: 10Gi
