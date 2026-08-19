@@ -33,3 +33,7 @@ variable "github_token_arn" {
 variable "user_data" {
   type = string
 }
+
+variable "discord_webhook_arn" {
+  type = string
+}

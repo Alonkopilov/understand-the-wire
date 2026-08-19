@@ -63,6 +63,7 @@ module "ec2" {
   private_ec2_sg        = module.network.output_private_ec2_sg
   tls_certificate       = module.acm.output_certificate_arn
   github_token_arn      = module.ssm.output_github_token_arn
+  discord_webhook_arn   = module.ssm.output_discord_webhook_arn
   user_data = templatefile("${path.module}/scripts/init-instance.sh.tpl", {
     oidc_bucket_name = "understand-the-wire-oidc-bucket"
     oidc_bucket_url  = "https://understand-the-wire-oidc-bucket.s3.eu-central-1.amazonaws.com"
@@ -91,7 +92,8 @@ module "cloudflare" {
 module "ssm" {
   source = "./ssm"
 
-  github_token = var.github_token
+  github_token    = var.github_token
+  discord_webhook = var.discord_webhook
 }
 
 module "s3" {

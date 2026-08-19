@@ -36,9 +36,9 @@ resource "aws_iam_role_policy_attachment" "worker_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_policy" "read_github_token_parameter" {
-  name        = "read_github_token_parameter"
-  description = "IAM policy to read the Github fine-grained token parameter from the parameter store"
+resource "aws_iam_policy" "read_parameter_store" {
+  name        = "read_parameter_store"
+  description = "IAM policy to read specific parameter store secrets"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -48,7 +48,8 @@ resource "aws_iam_policy" "read_github_token_parameter" {
         "ssm:Get*"
       ]
       Resource = [
-        var.github_token_arn
+        var.github_token_arn,
+        var.discord_webhook_arn
       ]
     }]
   })
@@ -56,7 +57,7 @@ resource "aws_iam_policy" "read_github_token_parameter" {
 
 resource "aws_iam_role_policy_attachment" "worker_role_policy_ssm" {
   role       = aws_iam_role.worker_role.name
-  policy_arn = aws_iam_policy.read_github_token_parameter.arn
+  policy_arn = aws_iam_policy.read_parameter_store.arn
 }
 
 resource "aws_iam_policy" "upload_oidc_files_s3" {

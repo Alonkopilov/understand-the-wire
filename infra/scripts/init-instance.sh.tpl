@@ -92,3 +92,15 @@ flux bootstrap github \
   --branch=$BRANCH \
   --path=./k8s/clusters/production \
   --personal
+
+# Set up Discord Webhook secret to allow Flux alerts to my channel
+DISCORD_WEBHOOK="$(aws ssm get-parameter \
+  --name /production/discord/webhook \
+  --with-decryption \
+  --query 'Parameter.Value' \
+  --output text)"
+
+kubectl create secret generic discord-webhook \
+  --namespace flux-system \
+  --from-literal=address="$DISCORD_WEBHOOK" \
+  --dry-run=client -o yaml | kubectl apply -f -

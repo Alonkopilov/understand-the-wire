@@ -34,3 +34,8 @@ variable "repo_name" {
 variable "branch" {
   type = string
 }
+
+variable "discord_webhook" {
+  type      = string
+  sensitive = true
+}

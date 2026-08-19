@@ -4,3 +4,10 @@ resource "aws_ssm_parameter" "github_token" {
   type        = "SecureString"
   value       = var.github_token
 }
+
+resource "aws_ssm_parameter" "discord_webhook" {
+  name        = "/production/discord/webhook"
+  description = "Discord Webhook URL for FluxCD alerts"
+  type        = "SecureString"
+  value       = var.discord_webhook
+}

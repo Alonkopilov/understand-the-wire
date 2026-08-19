@@ -6,3 +6,4 @@ resources:
 - infrastructure-controllers.yaml
 - infrastructure-configs.yaml
 - apps.yaml
+- notifications.yaml

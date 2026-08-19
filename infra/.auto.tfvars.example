@@ -9,3 +9,6 @@ github_token = "..."
 repo_owner = "..."
 repo_name = "..."
 branch = "..."
+
+// Discord
+discord_webhook = "..."
