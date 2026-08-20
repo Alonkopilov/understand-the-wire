@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: nginxdemos/hello
+        image: trainingdemos/k8s-frontend-podinfo:latest
         ports:
         - containerPort: 80
         resources:
