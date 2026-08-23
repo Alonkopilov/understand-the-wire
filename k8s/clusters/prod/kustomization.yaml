@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - flux-system
+- vars.yaml
 - infrastructure-controllers.yaml
 - infrastructure-configs.yaml
 - apps.yaml

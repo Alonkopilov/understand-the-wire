@@ -6,7 +6,7 @@ metadata:
 spec:
   type: discord
   secretRef:
-    name: discord-webhook      # key: address
+    name: discord-webhook  # It is the responsibility of the node to create this secret 
 ---
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Alert

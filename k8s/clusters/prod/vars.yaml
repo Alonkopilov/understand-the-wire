@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vars
+  namespace: flux-system
+data:
+  environment: prod
+  parameter_name_prefix: /utw/prod
+  name_prefix: utw-prod
+  aws_region: eu-central-1
+  account_id: "744092294111"
+  domain: understand-the-wire.com

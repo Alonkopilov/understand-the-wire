@@ -61,6 +61,6 @@ spec:
         enabled: true
         ingressClassName: traefik
         hosts:
-          - grafana.understand-the-wire.com
+          - grafana.${domain}
         path: /
         pathType: Prefix
