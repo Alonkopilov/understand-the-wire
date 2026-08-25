@@ -5,6 +5,7 @@ metadata:
   namespace: flux-system
 data:
   environment: prod
+  branch: master
   parameter_name_prefix: /utw/prod
   name_prefix: utw-prod
   aws_region: eu-central-1

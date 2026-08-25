@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: understand-the-wire
+  labels:
+    app.kubernetes.io/name: ingress
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: www.${domain}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/api"
+        backend:
+          service:
+            name: service
+            port: 
+              number: 8000

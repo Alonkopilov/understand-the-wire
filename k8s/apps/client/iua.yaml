@@ -1,0 +1,22 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: iua
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  interval: 1m0s
+  git:
+    checkout:
+      ref:
+        branch: ${branch}
+    commit:
+      author:
+        name: alonko
+        email: alon@kopilov.me
+      messageTemplate: '[CI TRIGGER] Updated client image'
+  update:
+    strategy: Setters
+    path: ./k8s/apps/client
