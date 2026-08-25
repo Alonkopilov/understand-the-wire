@@ -3,9 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import os, time
 from app.routes import health
 
-START_TIME = time.monotonic()
-POD = os.environ.get("HOSTNAME", "local")
-
 origins = [
     "http://localhost:5173"
 ]
