@@ -2,7 +2,7 @@ name: Build and Publish Client
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master]
     paths:
       - 'services/client/**'
   workflow_dispatch:

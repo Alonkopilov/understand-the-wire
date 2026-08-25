@@ -7,17 +7,15 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: frontend
+      app: server
   template:
     metadata:
       labels:
-        app: frontend
+        app: server
     spec:
       containers:
-      - name: frontend
-        image: trainingdemos/k8s-frontend-podinfo:latest
-        ports:
-        - containerPort: 80
+      - name: server
+        image: Example # {"$imagepolicy": "flux-system:server-imagepolicy"}
         resources:
           limits:
             memory: 128Mi

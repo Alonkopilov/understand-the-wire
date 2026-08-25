@@ -1,0 +1,13 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: imagepolicy
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: client-ir
+  filterTags:
+    pattern: '^\d{8}-\d{6}$'
+  policy:
+    alphabetical:
+      order: asc
