@@ -95,7 +95,8 @@ flux bootstrap github \
   --repository=$REPO_NAME \
   --branch=$BRANCH \
   --path=$FLUX_CLUSTER_PATH \
-  --personal
+  --personal \
+  --read-write-key
 
 # Set up Discord Webhook secret to allow Flux alerts to my channel
 DISCORD_WEBHOOK="$(aws ssm get-parameter \
