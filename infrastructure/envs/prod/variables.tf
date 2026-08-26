@@ -63,3 +63,8 @@ variable "grafana_password" {
   type      = string
   sensitive = true
 }
+
+variable "github_packages_token" {
+  type      = string
+  sensitive = true
+}

@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - cluster-secret-store.yaml
 - external-secrets-grafana.yaml
+- external-secrets-github.yaml

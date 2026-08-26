@@ -25,3 +25,10 @@ resource "aws_ssm_parameter" "grafana_password" {
   type        = "SecureString"
   value       = var.grafana_password
 }
+
+resource "aws_ssm_parameter" "github_packages_token" {
+  name        = "${var.name_prefix}/github/packages-token"
+  description = "Token to read Github packages for Flux ImageRepositories"
+  type        = "SecureString"
+  value       = var.github_packages_token
+}
