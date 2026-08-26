@@ -23,6 +23,12 @@ resource "aws_instance" "control-plane" {
   instance_type        = var.instance_type
   iam_instance_profile = aws_iam_instance_profile.control_plane_instance_profile.name
 
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+    encrypted   = true
+  }
+
   primary_network_interface {
     network_interface_id = aws_network_interface.control_plane_node_interface.id
   }
