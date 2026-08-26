@@ -1,10 +1,10 @@
-apiVersion: image.toolkit.fluxcd.io/v1beta1
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
   name: ir
   namespace: flux-system
 spec:
   secretRef:
-    name: ghp-credentials
+    name: github
   image: ghcr.io/alonkopilov/understand-the-wire-server-${environment}
   interval: 1m0s

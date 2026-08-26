@@ -1,11 +1,11 @@
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: imagepolicy
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: client-ir
+    name: server-ir
   filterTags:
     pattern: '^\d{8}-\d{6}$'
   policy:

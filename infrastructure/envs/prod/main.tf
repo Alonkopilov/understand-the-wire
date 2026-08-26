@@ -34,10 +34,11 @@ module "parameter_store" {
   source      = "../../modules/parameter-store"
   name_prefix = local.parameter_name_prefix
 
-  github_token     = var.github_token
-  discord_webhook  = var.discord_webhook
-  grafana_name     = var.grafana_name
-  grafana_password = var.grafana_password
+  github_token          = var.github_token
+  discord_webhook       = var.discord_webhook
+  grafana_name          = var.grafana_name
+  grafana_password      = var.grafana_password
+  github_packages_token = var.github_packages_token
 }
 
 # Constructs an EC2 K3S control plane node - sets up the cluster with Flux connected

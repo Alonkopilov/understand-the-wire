@@ -90,11 +90,13 @@ export GITHUB_TOKEN="$(aws ssm get-parameter \
   --output text)"
 
 flux bootstrap github \
+  --components-extra=image-reflector-controller,image-automation-controller \
   --owner=$REPO_OWNER \
   --repository=$REPO_NAME \
   --branch=$BRANCH \
   --path=$FLUX_CLUSTER_PATH \
-  --personal
+  --personal \
+  --read-write-key
 
 # Set up Discord Webhook secret to allow Flux alerts to my channel
 DISCORD_WEBHOOK="$(aws ssm get-parameter \

@@ -5,5 +5,8 @@ resources:
 - deployment.yaml
 - service.yaml
 - ingress.yaml
+- imagepolicy.yaml
+- imagerepo.yaml
+- iua.yaml
 
 namePrefix: client-
