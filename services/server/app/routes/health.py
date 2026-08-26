@@ -36,8 +36,10 @@ async def health():
 
 
     return {
-        "Status": "Ready",
+        "status": "Ready",
+        "version": VERSION,
         "pod": POD,
         "node": NODE,
+        "zone": "eu-central-1a",
         "uptimeSeconds": time.monotonic() - START_TIME
     }
