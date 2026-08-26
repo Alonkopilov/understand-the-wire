@@ -16,8 +16,8 @@ spec:
       serviceAccountName: sa
       containers:
       - name: server
-        image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260825-123958 # {"$imagepolicy": "flux-system:server-imagepolicy"}
-        env:       
+        image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260826-111616 # {"$imagepolicy": "flux-system:server-imagepolicy"}
+        env:
         - name: NODE_NAME
           valueFrom:
             fieldRef:
