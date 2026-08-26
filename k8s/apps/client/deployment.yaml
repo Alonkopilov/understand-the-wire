@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: Example # {"$imagepolicy": "flux-system:client-imagepolicy"}
+        image: ghcr.io/alonkopilov/understand-the-wire-client-prod:20260825-123402 # {"$imagepolicy": "flux-system:client-imagepolicy"}
         resources:
           limits:
             memory: 128Mi
