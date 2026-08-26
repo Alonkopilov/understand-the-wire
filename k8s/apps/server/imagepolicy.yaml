@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: client-ir
+    name: server-ir
   filterTags:
     pattern: '^\d{8}-\d{6}$'
   policy:
