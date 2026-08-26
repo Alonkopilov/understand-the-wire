@@ -90,6 +90,7 @@ export GITHUB_TOKEN="$(aws ssm get-parameter \
   --output text)"
 
 flux bootstrap github \
+  --components-extra=image-reflector-controller,image-automation-controller \
   --owner=$REPO_OWNER \
   --repository=$REPO_NAME \
   --branch=$BRANCH \
