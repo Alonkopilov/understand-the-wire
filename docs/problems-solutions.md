@@ -47,6 +47,35 @@ I created VPC endpoints to allow internal connection between AWS and my instance
 
 **How did I solve it? -** The intended behavior is that if a Flux Kustomization resource references a folder, it executes `kustomize build` in the background for it, so having a `Kustomization.yaml` reference it created double referencing that broke the apply order.
 
+---
+
+### Flux unable to push commits to my repo
+
+**What happened? -** I set up Flux `ImageRepository`, `ImageUpdateAutomation` and `ImagePolicy` manifests to automatically detect and update deployment image versions, but got an error that the token I used didn't have 'write' permissions 
+
+**What it turned out to be? -** Turned out that I missed a flag `--read-write-key` in the `flux bootstrap` command, that allows to create a read-write key to allow flux to push commits.
+
+**How did I solve it? -** I found this error by connecting into the instance with `SSM Session Manager`, and debugging the source of the problem with flux and kubectl. I just added the missing flag later.
+
+---
+
+### Accessing Kubernetes API Server from a Pod
+
+**What happened? -** I needed a way to allow my backend pod to access the information of other pods, deployments and nodes to gather data to show on the client.
+
+**How did I solve it? -** I added an RBAC role like we used at work, and created a service account for my backend pod so that I could connect the RBAC to it. Because I also needed access to read node data, I created a Cluster RBAC role and not a regular role. 
+
+---
+
+### Disk Pressure Outage
+
+**What happened? -** I deployed a new version for my backend, and suddenly I see **hundreds of evicted pods** in my nodes, and its stuck in a loop.
+
+**What it looked like? -** The node spammed backend pods, and most of them had errors or evicted states. 
+
+**What it turned out to be? -** After running `kubectl describe` on one of the pods and the nodes, I seen that the node declared a **Disk Pressure** state. The node storage got too low, that Kubernetes tried to remove pods but they were just created again and got stuck in a loop. 
+
+**How did I solve it? -** I forgot to add a custom disk to my instance, so it got a default 8GB storage, which is not enough at all. I bumped up the storage to 30GB by creating a gp3 SSD in Terraform for the instance.
 
 <!-- ### Dealing with Spot instances
 **What happened? -** 
