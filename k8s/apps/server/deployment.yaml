@@ -13,9 +13,15 @@ spec:
       labels:
         app: server
     spec:
+      serviceAccountName: sa
       containers:
       - name: server
         image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260825-123958 # {"$imagepolicy": "flux-system:server-imagepolicy"}
+        env:       
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         resources:
           limits:
             memory: 128Mi

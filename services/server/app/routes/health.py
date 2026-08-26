@@ -8,6 +8,7 @@ import os, time
 START_TIME = time.monotonic()
 POD = os.environ.get("HOSTNAME", "local")
 NODE = os.environ.get("NODE_NAME", "laptop")
+VERSION = os.environ.get("VERSION", "-1")
 
 router = APIRouter()
 
@@ -35,7 +36,7 @@ async def health():
 
 
     return {
-        "Status": "ON!",
+        "Status": "Ready",
         "pod": POD,
         "node": NODE,
         "uptimeSeconds": time.monotonic() - START_TIME

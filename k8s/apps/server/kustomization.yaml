@@ -8,5 +8,7 @@ resources:
 - imagepolicy.yaml
 - imagerepo.yaml
 - iua.yaml
+- serviceaccount.yaml
+- rbac.yaml
 
 namePrefix: server-
