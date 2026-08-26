@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: server
-        image: Example # {"$imagepolicy": "flux-system:server-imagepolicy"}
+        image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260825-123958 # {"$imagepolicy": "flux-system:server-imagepolicy"}
         resources:
           limits:
             memory: 128Mi
