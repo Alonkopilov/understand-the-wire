@@ -14,6 +14,14 @@ spec:
         app: server
     spec:
       serviceAccountName: sa
+      volumes:
+        - name: aws-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  audience: sts.amazonaws.com
+                  expirationDate: 3600
       containers:
       - name: server
         image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260826-140242 # {"$imagepolicy": "flux-system:server-imagepolicy"}
@@ -22,6 +30,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        volumeMounts:
+          - name: aws-token
+            mountPath: /var/run/secrets
+            readOnly: true
         resources:
           limits:
             memory: 128Mi

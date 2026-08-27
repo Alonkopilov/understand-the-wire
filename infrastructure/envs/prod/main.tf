@@ -130,3 +130,44 @@ module "external_secrets_sa" {
   oidc_provider_arn    = module.cluster_oidc_issuer_bucket.oidc_provider_arn
   oidc_provider_domain = module.cluster_oidc_issuer_bucket.oidc_provider_domain
 }
+
+module "server_sa" {
+  source      = "../../modules/service-account"
+  name_prefix = local.name_prefix
+
+  service_account_name = "server-sa"
+  namespace            = "understand-the-wire"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ReadNetworkAndLoadBalancer",
+        Effect = "Allow",
+        Action = [
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeRouteTables",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:DescribeTargetHealth",
+          "acm:ListCertificates",
+        ],
+        Resource = "*",
+        Condition = {
+          StringEquals = {
+            "aws:RequestedRegion" = var.region
+          }
+        }
+      },
+      {
+        Sid      = "ReadCertificate",
+        Effect   = "Allow",
+        Action   = ["acm:DescribeCertificate"],
+        Resource = module.acm.certificate_arn,
+      },
+    ]
+  })
+
+  oidc_provider_arn    = module.cluster_oidc_issuer_bucket.oidc_provider_arn
+  oidc_provider_domain = module.cluster_oidc_issuer_bucket.oidc_provider_domain
+}
