@@ -1,25 +1,21 @@
 from typing import Dict, List
 
 from fastapi import APIRouter
-from kubernetes.aio import client, config
-from kubernetes.aio.client.api_client import ApiClient
+from kubernetes.aio import client
 from kubernetes.client import V1Deployment, V1Node, V1Pod
-from datetime import datetime, timezone
-import os, time
-
+from datetime import datetime
 
 router = APIRouter()
 
-
 def is_node_ready(node: V1Node) -> bool:
-    conditions = node.status.conditions
+    conditions = node.status.conditions or [ ]
     for condition in conditions:
         if condition.type == "Ready" and condition.status == "True":
             return True
     return False
 
 def is_pod_ready(pod: V1Pod) -> bool:
-    conditions = pod.status.conditions
+    conditions = pod.status.conditions or []
     for condition in conditions:
         if condition.type == "Ready" and condition.status == "True":
             return True
@@ -27,7 +23,7 @@ def is_pod_ready(pod: V1Pod) -> bool:
 
 
 def get_pod_restarts(pod: V1Pod) -> int:
-    containers = pod.status.container_statuses
+    containers = pod.status.container_statuses or []
 
     restarts = 0
     for container in containers:
@@ -38,8 +34,10 @@ def get_pod_restarts(pod: V1Pod) -> int:
 
 def get_pod_age(pod: V1Pod) -> int:
     start_time = pod.status.start_time
+    if start_time is None:
+        return 0
     now = datetime.now(start_time.tzinfo)
-    age = (now - start_time).total_seconds()
+    age = round((now - start_time).total_seconds())
 
     return age
 
@@ -73,8 +71,6 @@ async def cluster():
     }
 
     async with client.ApiClient() as api:
-        config.load_incluster_config()
-
         # List nodes and extract information
         v1 = client.CoreV1Api(api)
         nodes = await v1.list_node()
@@ -99,11 +95,11 @@ async def cluster():
             details = {
                 "name": deployment.metadata.name,
                 "namespace": deployment.metadata.namespace,
-                "kind": deployment.kind,
-                "ready": deployment.status.ready_replicas,
+                "kind": "Deployment",
+                "ready": deployment.status.ready_replicas or 0,
                 "desired": deployment.spec.replicas,
-                "pods": get_pods(api, deployment.metadata.namespace, deployment)
+                "pods": await get_pods(api, deployment.metadata.namespace, deployment)
             }
             cluster["workloads"].append(details)
 
-    return details
+    return cluster
