@@ -5,3 +5,4 @@ resources:
 - namespaces.yaml
 - helm-external-secrets.yaml
 - helm-prometheus-community.yaml
+- helm-traefik.yaml
