@@ -5,4 +5,4 @@ metadata:
   namespace: understand-the-wire
 data:
   AWS_ROLE_ARN: arn:aws:iam::${account_id}:role/utw-${environment}-understand-the-wire-server-sa-role
-  AWS_WEB_IDENTITY_TOKEN_FILE: /var/run/secrets/token
+  AWS_WEB_IDENTITY_TOKEN_FILE: /var/run/secrets/aws/token
