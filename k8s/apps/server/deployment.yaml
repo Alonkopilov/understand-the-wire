@@ -4,7 +4,7 @@ metadata:
   name: deployment
   namespace: understand-the-wire
 spec:
-  replicas: 0
+  replicas: 2
   selector:
     matchLabels:
       app: server
