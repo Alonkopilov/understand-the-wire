@@ -23,24 +23,24 @@ spec:
                   audience: sts.amazonaws.com
                   expirationDate: 3600
       containers:
-      - name: server
-        image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260826-140242 # {"$imagepolicy": "flux-system:server-imagepolicy"}
-        envFrom:
-          - configMapRef:
-              name: config
-        env:
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        volumeMounts:
-          - name: aws-token
-            mountPath: /var/run/secrets/aws
-            readOnly: true
-        resources:
-          limits:
-            memory: 128Mi
-            cpu: 100m
-          requests:
-            memory: 128Mi
-            cpu: 40m
+        - name: server
+          image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260827-093232 # {"$imagepolicy": "flux-system:server-imagepolicy"}
+          envFrom:
+            - configMapRef:
+                name: config
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          volumeMounts:
+            - name: aws-token
+              mountPath: /var/run/secrets/aws
+              readOnly: true
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 100m
+            requests:
+              memory: 128Mi
+              cpu: 40m
