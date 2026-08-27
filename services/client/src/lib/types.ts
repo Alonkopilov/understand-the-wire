@@ -107,9 +107,9 @@ export type FluxResource = {
 export type Flux = {
   resources: FluxResource[]
   repository?: {
-    url: string
-    branch: string
-    revision?: string
+    url: string  // GitRepository.spec.url
+    branch: string  // GitRepository.spec.ref.branch
+    revision?: string  // GitRepository.status.artifact.revision
   }
 }
 
