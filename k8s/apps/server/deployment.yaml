@@ -24,7 +24,7 @@ spec:
                   expirationDate: 3600
       containers:
         - name: server
-          image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260827-120437 # {"$imagepolicy": "flux-system:server-imagepolicy"}
+          image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260827-150418 # {"$imagepolicy": "flux-system:server-imagepolicy"}
           envFrom:
             - configMapRef:
                 name: config
