@@ -16,6 +16,10 @@ router = APIRouter()
 @router.get("/api/trace")
 async def trace(request: Request):
     headers = request.headers
+    host = request.get("host", "")
+    alb_trace_id = request.get("x-amzn-trace-id", "")
+    forwarded_server = request.get("x-forwarded-server", "")
+    
     return {
         "headers": headers,
         "pod": POD,
