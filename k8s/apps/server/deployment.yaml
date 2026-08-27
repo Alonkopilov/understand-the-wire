@@ -35,7 +35,7 @@ spec:
               fieldPath: spec.nodeName
         volumeMounts:
           - name: aws-token
-            mountPath: /var/run/secrets/aws/token
+            mountPath: /var/run/secrets/aws
             readOnly: true
         resources:
           limits:
