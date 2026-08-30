@@ -21,10 +21,10 @@ spec:
               - serviceAccountToken:
                   path: token
                   audience: sts.amazonaws.com
-                  expirationDate: 3600
+                  expirationSeconds: 3600
       containers:
         - name: server
-          image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260830-105541 # {"$imagepolicy": "flux-system:server-imagepolicy"}
+          image: ghcr.io/alonkopilov/understand-the-wire-server-prod:20260830-104748 # {"$imagepolicy": "flux-system:server-imagepolicy"}
           envFrom:
             - configMapRef:
                 name: config
@@ -39,8 +39,8 @@ spec:
               readOnly: true
           resources:
             limits:
-              memory: 128Mi
+              memory: 512Mi
               cpu: 100m
             requests:
-              memory: 128Mi
+              memory: 512Mi
               cpu: 40m
