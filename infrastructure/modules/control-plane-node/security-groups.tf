@@ -4,14 +4,14 @@ resource "aws_security_group" "private_ec2_sg" {
   vpc_id      = var.vpc_id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_https_inbound_traffic_from_vpc_endpoints" {
-  security_group_id            = aws_security_group.private_ec2_sg.id
-  description                  = "Allow HTTP inbound connections from the VPC Endpoints (SSM)"
-  referenced_security_group_id = var.vpc_endpoint_sg_id
-  from_port                    = "443"
-  ip_protocol                  = "tcp"
-  to_port                      = "443"
-}
+# resource "aws_vpc_security_group_ingress_rule" "allow_https_inbound_traffic_from_vpc_endpoints" {
+#   security_group_id            = aws_security_group.private_ec2_sg.id
+#   description                  = "Allow HTTP inbound connections from the VPC Endpoints (SSM)"
+#   referenced_security_group_id = var.vpc_endpoint_sg_id
+#   from_port                    = "443"
+#   ip_protocol                  = "tcp"
+#   to_port                      = "443"
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_http_inbound_traffic_from_alb" {
   security_group_id            = aws_security_group.private_ec2_sg.id

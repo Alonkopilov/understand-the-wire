@@ -23,9 +23,6 @@ async def trace(request: Request):
     forwarded_portocol = headers.get("x-forwarded-proto", "")
     real_ip = headers.get("x-real-ip", "")
 
-    server_host, server_port = request.scope["server"]
-    client_host, client_port = request.scope["client"]
-
     hops = [
         {
             "id": "dns",
@@ -100,10 +97,20 @@ async def trace(request: Request):
                     "mono": True
                 }
             ]
-        }
+        },
+        {
+            "id": "pod",
+            "title": "Server Pod",
+            "subtitle": "The FastAPI process that produced this response",
+            "nodeId": "apps",
+            "facts": [
+                {"label": "Pod", "value": POD, "mono": True},
+                {"label": "Received from", "value": host, "mono": True},
+            ],
+        },
     ]
     
     return {
         "hops": hops,
-        "servedAt": datetime.now().isoformat()
+        "servedAt": datetime.now(timezone.utc).isoformat()
     }
