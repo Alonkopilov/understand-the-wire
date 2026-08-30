@@ -147,6 +147,7 @@ module "server_sa" {
           "ec2:DescribeVpcs",
           "ec2:DescribeSubnets",
           "ec2:DescribeRouteTables",
+          "ec2:DescribeInstances",
           "elasticloadbalancing:DescribeLoadBalancers",
           "elasticloadbalancing:DescribeTargetGroups",
           "elasticloadbalancing:DescribeTargetHealth",
