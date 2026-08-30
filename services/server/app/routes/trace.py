@@ -12,14 +12,15 @@ router = APIRouter()
 @router.get("/api/trace")
 async def trace(request: Request):
     headers = request.headers
-    host = headers.get("host", "")
+    host_header = headers.get("host", "")
     alb_trace_id = headers.get("x-amzn-trace-id", "")
     forwarded_server = headers.get("x-forwarded-server", "")
     forwarded_port = headers.get("x-forwarded-port", "")
     forwarded_protocol = headers.get("x-forwarded-proto", "")
+    host = request.client.host if request.client else ""
 
     forwards = headers.get("x-forwarded-for", "").split(",")
-    source_ip = forwards[-1] if len(forwards) > 0 else ""
+    source_ip = forwards[-1].strip()
 
     hops = [
         {
@@ -27,11 +28,11 @@ async def trace(request: Request):
             "title": "Cloudflare DNS",
             "subtitle": "Contains the CNAME that points to the Load Balancer url in AWS",
             "nodeId": "cloudflare",
-            "status": "ok" if host else "unknown",
+            "status": "ok" if host_header else "unknown",
             "facts": [
                 {
                     "label": "Hostname",
-                    "value": host,
+                    "value": host_header,
                     "mono": True
                 }
             ]
