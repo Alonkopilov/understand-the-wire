@@ -1,14 +1,10 @@
 from fastapi import APIRouter, Request
-from kubernetes.aio import client, config
-from kubernetes.aio.client.api_client import ApiClient
 from datetime import datetime, timezone
-import os, time
+import os
 
 
-START_TIME = time.monotonic()
 POD = os.environ.get("HOSTNAME", "local")
 NODE = os.environ.get("NODE_NAME", "laptop")
-VERSION = os.environ.get("VERSION", "-1")
 
 router = APIRouter()
 
@@ -20,8 +16,10 @@ async def trace(request: Request):
     alb_trace_id = headers.get("x-amzn-trace-id", "")
     forwarded_server = headers.get("x-forwarded-server", "")
     forwarded_port = headers.get("x-forwarded-port", "")
-    forwarded_portocol = headers.get("x-forwarded-proto", "")
-    real_ip = headers.get("x-real-ip", "")
+    forwarded_protocol = headers.get("x-forwarded-proto", "")
+
+    forwards = headers.get("x-forwarded-for", "").split(",")
+    source_ip = forwards[-1] if len(forwards) > 0 else ""
 
     hops = [
         {
@@ -29,6 +27,7 @@ async def trace(request: Request):
             "title": "Cloudflare DNS",
             "subtitle": "Contains the CNAME that points to the Load Balancer url in AWS",
             "nodeId": "cloudflare",
+            "status": "ok" if host else "unknown",
             "facts": [
                 {
                     "label": "Hostname",
@@ -42,6 +41,7 @@ async def trace(request: Request):
             "title": "AWS Application Load Balancer",
             "subtitle": "Internet-facing ALB, automatically redirects HTTP to HTTPS, TLS is terminated from this point.",
             "nodeId": "alb",
+            "status": "ok" if alb_trace_id else "unknown",
             "facts": [
                 {
                     "label": "ALB Trace ID",
@@ -50,7 +50,7 @@ async def trace(request: Request):
                 },
                 {
                     "label": "Protocol",
-                    "value": forwarded_portocol,
+                    "value": forwarded_protocol,
                     "mono": True
                 },
                 {
@@ -65,6 +65,7 @@ async def trace(request: Request):
             "title": "Target Group",
             "subtitle": "The ALB targets all requests to the nodes in the private subnet",
             "nodeId": "target-group",
+            "status": "ok" if alb_trace_id else "unknown",
             "facts": []
         },
         {
@@ -72,6 +73,7 @@ async def trace(request: Request):
             "title": "EC2 Node",
             "subtitle": "The nodes sit in private subnets, running Kubernetes with K3S",
             "nodeId": "ec2",
+            "status": "ok" if NODE else "unknown",
             "facts": [
                 {
                     "label": "Node Name",
@@ -85,6 +87,7 @@ async def trace(request: Request):
             "title": "Traefik Ingress",
             "subtitle": "The Traefik ingress controller routes requests to the relevant pods",
             "nodeId": "traefik",
+            "status": "ok" if forwarded_server else "unknown",
             "facts": [
                 {
                     "label": "Traefik Pod",
@@ -92,8 +95,8 @@ async def trace(request: Request):
                     "mono": True
                 },
                 {
-                    "label": "The CNI Bridge IP (The 'default gateway' of the Node)",
-                    "value": real_ip,
+                    "label": "Entered pod network via",
+                    "value": source_ip,
                     "mono": True
                 }
             ]
@@ -103,6 +106,7 @@ async def trace(request: Request):
             "title": "Server Pod",
             "subtitle": "The FastAPI process that produced this response",
             "nodeId": "apps",
+            "status": "ok" if POD else "unknown",
             "facts": [
                 {"label": "Pod", "value": POD, "mono": True},
                 {"label": "Received from", "value": host, "mono": True},
