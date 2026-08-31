@@ -241,7 +241,10 @@ export const NODES: MapNode[] = [
     sublabel: "utw-prod-allow-tcp-to-alb",
     layer: "network",
     row: 2,
-    why: [],
+    why: [
+      "Dictates what inbound/outbound traffic is allowed for an AWS resource.",
+      "In the case of the ALB, I wanted it to be accessed from the internet using HTTP only. I created a security group to allow only inbound and outbound with port 80 and port 443.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/load-balancer/security-groups.tf",
@@ -255,7 +258,10 @@ export const NODES: MapNode[] = [
     sublabel: "utw-prod-tg · HTTP :80",
     layer: "network",
     row: 2,
-    why: [],
+    why: [
+      "The target group dictates where should the Load Balancer forward requests to.",
+      "I set the Load Balancer to target traffic to the EC2 nodes, they host the services that serve the data you see here.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/load-balancer/target-groups.tf",
@@ -270,7 +276,11 @@ export const NODES: MapNode[] = [
     sublabel: "+ Elastic IP",
     layer: "network",
     row: 3,
-    why: [],
+    why: [
+      "The NAT is an important component that allows private instances to have outbound access to the internet using IP translation. We need it here because even though our worker nodes are isolated and secured, they still need to access the internet to install packages and send requests to external services.",
+      "Without having a NAT, you can't install k3s, python/node libraries and more, because my nodes sit in private subnets with no access to the internet.",
+      "*Important Note* - Again, this is another notable instance where I had to balance cost vs operational overhead. I technically could've hosted an EC2 that acted as a NAT instance, but the cost of a managed AWS NAT was manageable for me personally (the infrastructure does not run 24/7), so that I wouldn't need to deal with the operational overhead, which wasn't in the learning scope of this project for me anyway.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/network/nat.tf",
@@ -284,7 +294,11 @@ export const NODES: MapNode[] = [
     sublabel: "eu-central-1a · 1b",
     layer: "network",
     row: 3,
-    why: [],
+    why: [
+      "Subnets are subdivisions of the VPC and allow to host resources with clear access boundaries.",
+      "The control plane and worker nodes I provision sit in private subnets, they are unreachable from the public internet and can only be accessed by resources inside the VPC. This allows my instances to be safely isolated and secured.",
+      "I have two private subnets spanning two availability zones to allow redundancy.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/network/subnets.tf",
@@ -310,7 +324,12 @@ export const NODES: MapNode[] = [
     sublabel: "ssm · ssmmessages · ec2messages",
     layer: "network",
     row: 4,
-    why: [],
+    why: [
+      "Allows EC2 instances with no internet egress to access the SSM API endpoints with traffic flowing completely in the AWS network.",
+      "Background: I wanted to find the most secure way to connect to my nodes for testing and debugging purposes. The most common way is to open port 22 to the internet, allowing me to connect to them from my laptop using SSH. The tradeoff is that it makes the instances not entirely isolated anymore. Another way is to use the 'AWS SSM Session Manager', which allows secure traffic between me and the instance using AWS SSM as a middle man.",
+      "Basically, in ec2 instances with the Amazon Linux AMI 2023, a 'SSM Agent' is installed by default, and it is the software that allows the instance to send and receive traffic to/from SSM.",
+      "*Important Note* - As of writing this, the VPC endpoints are NOT USED anymore to manage costs. Since I already have a NAT Gateway provisioned for other outbound traffic, the added security of routing SSM traffic through VPC endpoints wasn't worth the extra ~$40-60/month for my use case, but it's still important to understand what's their purpose and why I used them.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/network/endpoints.tf",
