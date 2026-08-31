@@ -55,7 +55,10 @@ export const NODES: MapNode[] = [
     sublabel: "browser / curl",
     layer: "edge",
     row: 0,
-    why: [],
+    why: [
+      "You guessed it, its you.",
+      "The person visiting this website from the browser. You just finished typing 'www.understand-the-wire.com', and pressed Enter.",
+    ],
     sources: [],
   },
   {
@@ -64,7 +67,12 @@ export const NODES: MapNode[] = [
     sublabel: "zone understand-the-wire.com",
     layer: "edge",
     row: 0,
-    why: [],
+    why: [
+      "The network knows to route packets with IPs, it has no idea how to route 'www.understand-the-wire.com'. The browser needs to send a DNS request to resolve the IP that serves the website, and someone has to hold this domain and give answers.",
+      "I decided to use Cloudflare to host my domain, because it is well known and has a strong Terraform integration, allowing me to automatically create CNAME records to point at my Load Balancer and verify my TLS certificate to allow HTTPS (more on both of them later)",
+      "*Important Note* - When reading the explanations I want you to remember the mindset: the project is ephemeral, the infra is fully managed in Terraform allowing me to apply the infrastructure in the morning, and destroy it when I am done working on it for the day. That means networking endpoints like Load Balancer endpoints, certificates and DNS records change between applies, and my Terraform configuration is designed to deal with that, to have fully working infrastructure without manual steps after applying.",
+      "Having the infrastructure fully managed allows me to save significant amounts of money and manual work.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/cloudflare/main.tf",
@@ -79,7 +87,13 @@ export const NODES: MapNode[] = [
     sublabel: "*.understand-the-wire.com",
     layer: "edge",
     row: 0,
-    why: [],
+    why: [
+      "Every modern secure website has to have encryption in transit (HTTPS). In order to have that, the browser needs to verify that I own the domain 'understand-the-wire.com', and it verifies it by looking at the certificate sent by AWS.",
+      "Where does AWS get the certificate? - It is the one that holds it. The certificate for 'under...com' is created in AWS ACM, but it still means nothing on its own, because everyone can create a certificate for anything, if it is actually verified is a different thing.",
+      "How did I verify the certificate? - AWS ACM gives me DNS validation records, that I have to set in Cloudflare where I host my domain. If they are set, it means that I actually control the domain and AWS signs this certificate.",
+      "The browser sees that the certificate is signed by the AWS Root CA and it is one of the CAs it trusts, allowing me to have HTTPS.",
+      "This whole process is completely mananged in my Terraform and happens automatically!",
+    ],
     sources: [
       { path: "infrastructure/modules/acm/main.tf", label: "acm/main.tf" },
       { path: "infrastructure/envs/prod/main.tf", label: "envs/prod/main.tf" },
@@ -101,7 +115,10 @@ export const NODES: MapNode[] = [
     sublabel: "10.50.0.0/16",
     layer: "network",
     row: 0,
-    why: [],
+    why: [
+      "This is the isolated private network inside AWS that hosts network resources, Subnets, Instances, ELBs and more live in it, and it allows a boundary of access.",
+      "If you open an AWS account you get a default VPC, but to allow more control I created a custom one in Terraform with a defined IP range.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/network/vpc.tf",
@@ -127,7 +144,11 @@ export const NODES: MapNode[] = [
     sublabel: "eu-central-1a · 1b",
     layer: "network",
     row: 1,
-    why: [],
+    why: [
+      "Subnets are subdivisions of the VPC and allow to host resources with clear access boundaries.",
+      "The Application Load Balancer I provision sits in public subnets, and makes for the only entity that can be reached by the internet. The subnet is associated with a route table that rules 0.0.0.0/0 -> Internet Gateway, which allows internet access and is what actually makes this subnet defined as 'public'.",
+      "I have two public subnets spanning two availability zones to allow redundancy.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/network/subnets.tf",
@@ -142,11 +163,13 @@ export const NODES: MapNode[] = [
       if (!aws) return [];
       return aws.subnets
         .filter((subnet) => subnet.public)
-        .map((subnet): Fact => ({
-          label: subnet.zone,
-          value: `${subnet.cidr} · ${subnet.id}`,
-          mono: true,
-        }));
+        .map(
+          (subnet): Fact => ({
+            label: subnet.zone,
+            value: `${subnet.cidr} · ${subnet.id}`,
+            mono: true,
+          }),
+        );
     },
   },
   {
@@ -154,7 +177,10 @@ export const NODES: MapNode[] = [
     label: "Internet Gateway",
     layer: "network",
     row: 1,
-    why: [],
+    why: [
+      "Network entity that makes inbound and outbound access to the internet possible.",
+      "Once I provision an Internet Gateway, I can have my route table associate it with my public subnets, allowing internet traffic to it. Without it nothing could reach my Load Balancer.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/network/internet-gateway.tf",
@@ -168,7 +194,13 @@ export const NODES: MapNode[] = [
     sublabel: "utw-prod-alb · internet-facing",
     layer: "network",
     row: 2,
-    why: [],
+    why: [
+      "The Load Balancer works in layer 7 of the network and allows to inspect and redirect incoming requests to whichever targets I choose, and literally load balance requests between them.",
+      "Moreover, I automatically get a public DNS endpoint that I can point my domain to, I can do health checks and if I wanted to add another worker node I could easily do it.",
+      "It comes at a cost though, approximately 16$ per month if running 24/7.",
+      "*Important Note* - a big theme that I felt while making this project is finding the balance between using managed resources that cost more money, to self-manage resources that save money, but are traded off with more operational overhead.",
+      "For example, using a managed EKS cluster against running your own cluster with K3S on EC2 instances. I decided to self-manage components that I wanted to learn their mechanics more deeply, or when the cost differentiator was just a lot better.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/load-balancer/main.tf",
@@ -192,12 +224,14 @@ export const NODES: MapNode[] = [
       return [
         { label: "DNS name", value: aws.loadBalancer.dnsName, mono: true },
         { label: "Scheme", value: aws.loadBalancer.scheme },
-        ...aws.loadBalancer.targets.map((target): Fact => ({
-          label: `Target ${target.id}`,
-          value: `${target.health} · ${target.zone}`,
-          mono: true,
-          status: target.health === "healthy" ? "ok" : "warn",
-        })),
+        ...aws.loadBalancer.targets.map(
+          (target): Fact => ({
+            label: `Target ${target.id}`,
+            value: `${target.health} · ${target.zone}`,
+            mono: true,
+            status: target.health === "healthy" ? "ok" : "warn",
+          }),
+        ),
       ];
     },
   },
@@ -261,11 +295,13 @@ export const NODES: MapNode[] = [
       if (!aws) return [];
       return aws.subnets
         .filter((subnet) => !subnet.public)
-        .map((subnet): Fact => ({
-          label: subnet.zone,
-          value: `${subnet.cidr} · ${subnet.id}`,
-          mono: true,
-        }));
+        .map(
+          (subnet): Fact => ({
+            label: subnet.zone,
+            value: `${subnet.cidr} · ${subnet.id}`,
+            mono: true,
+          }),
+        );
     },
   },
   {
@@ -456,11 +492,13 @@ export const NODES: MapNode[] = [
     ],
     live: ({ cluster }) => {
       if (!cluster) return [];
-      return cluster.workloads.map((workload): Fact => ({
-        label: `${workload.namespace}/${workload.name}`,
-        value: `${workload.ready}/${workload.desired} ready`,
-        status: workload.ready === workload.desired ? "ok" : "warn",
-      }));
+      return cluster.workloads.map(
+        (workload): Fact => ({
+          label: `${workload.namespace}/${workload.name}`,
+          value: `${workload.ready}/${workload.desired} ready`,
+          status: workload.ready === workload.desired ? "ok" : "warn",
+        }),
+      );
     },
   },
 
