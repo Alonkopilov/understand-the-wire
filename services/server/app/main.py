@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import health, cluster, flux, trace, aws
+from app.routes import health, cluster, flux, trace, aws, source
 from kubernetes.aio import config
 
 origins = [
@@ -25,6 +25,7 @@ def create_application() -> FastAPI:
     application.include_router(flux.router)
     application.include_router(trace.router)
     application.include_router(aws.router)
+    application.include_router(source.router)
 
     application.add_middleware(
         CORSMiddleware,

@@ -11,3 +11,5 @@ data:
   aws_region: eu-central-1
   account_id: "744092294111"
   domain: understand-the-wire.com
+  owner: Alonkopilov
+  repo: understand-the-wire
