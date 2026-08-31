@@ -1,19 +1,25 @@
-import { useEffect, useRef, useState } from 'react'
-import type { LiveContext, SourceFile } from '../lib/types.ts'
-import type { MapNode, SourceRef } from '../data/topology.ts'
-import { languageFor } from '../lib/api.ts'
-import { useResource } from '../lib/useResource.ts'
-import { CodeBlock, FactList, Skeleton, Unavailable } from './ui.tsx'
+import { useEffect, useRef, useState } from "react";
+import type { LiveContext, SourceFile } from "../lib/types.ts";
+import type { MapNode, SourceRef } from "../data/topology.ts";
+import { languageFor } from "../lib/api.ts";
+import { useResource } from "../lib/useResource.ts";
+import { CodeBlock, FactList, Skeleton, Unavailable } from "./ui.tsx";
 
-type Tab = 'why' | 'code' | 'live'
+type Tab = "why" | "code" | "live";
 
 function CodeTab({ sources }: { sources: SourceRef[] }) {
-  const [active, setActive] = useState(0)
-  const path = sources[active]?.path ?? ''
-  const file = useResource<SourceFile>(path ? `/source?path=${encodeURIComponent(path)}` : '')
+  const [active, setActive] = useState(0);
+  const path = sources[active]?.path ?? "";
+  const file = useResource<SourceFile>(
+    path ? `/source?path=${encodeURIComponent(path)}` : "",
+  );
 
   if (sources.length === 0) {
-    return <p className="muted">This box is not created by any file in the repository.</p>
+    return (
+      <p className="muted">
+        This box is not created by any file in the repository.
+      </p>
+    );
   }
 
   return (
@@ -26,7 +32,9 @@ function CodeTab({ sources }: { sources: SourceRef[] }) {
               role="tab"
               key={source.path}
               aria-selected={index === active}
-              className={index === active ? 'file-tab file-tab-active' : 'file-tab'}
+              className={
+                index === active ? "file-tab file-tab-active" : "file-tab"
+              }
               onClick={() => setActive(index)}
             >
               {source.label}
@@ -35,9 +43,9 @@ function CodeTab({ sources }: { sources: SourceRef[] }) {
         </div>
       ) : null}
 
-      {file.status === 'loading' ? <Skeleton rows={6} /> : null}
+      {file.status === "loading" ? <Skeleton rows={6} /> : null}
 
-      {file.status === 'unavailable' ? (
+      {file.status === "unavailable" ? (
         <Unavailable
           what="Source"
           detail={`Wire up GET /api/source?path=${path} to show ${sources[active].label} here.`}
@@ -53,7 +61,7 @@ function CodeTab({ sources }: { sources: SourceRef[] }) {
         />
       ) : null}
     </div>
-  )
+  );
 }
 
 /**
@@ -65,18 +73,18 @@ function InspectorPanel({
   live,
   onClose,
 }: {
-  node: MapNode
-  live: LiveContext
-  onClose: () => void
+  node: MapNode;
+  live: LiveContext;
+  onClose: () => void;
 }) {
-  const [tab, setTab] = useState<Tab>('why')
-  const panelRef = useRef<HTMLElement | null>(null)
+  const [tab, setTab] = useState<Tab>("why");
+  const panelRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    panelRef.current?.focus()
-  }, [])
+    panelRef.current?.focus();
+  }, []);
 
-  const facts = node.live ? node.live(live) : []
+  const facts = node.live ? node.live(live) : [];
 
   return (
     <>
@@ -92,30 +100,37 @@ function InspectorPanel({
         <header className="inspector-head">
           <div>
             <h2>{node.label}</h2>
-            {node.sublabel ? <p className="muted mono">{node.sublabel}</p> : null}
+            {node.sublabel ? (
+              <p className="muted mono">{node.sublabel}</p>
+            ) : null}
           </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="icon-button"
+            onClick={onClose}
+            aria-label="Close"
+          >
             ✕
           </button>
         </header>
 
         <div className="tabs" role="tablist" aria-label="Detail view">
-          {(['why', 'code', 'live'] as Tab[]).map((id) => (
+          {(["why", "code", "live"] as Tab[]).map((id) => (
             <button
               type="button"
               role="tab"
               key={id}
               aria-selected={tab === id}
-              className={tab === id ? 'tab tab-active' : 'tab'}
+              className={tab === id ? "tab tab-active" : "tab"}
               onClick={() => setTab(id)}
             >
-              {id === 'why' ? 'Why' : id === 'code' ? 'Code' : 'Live'}
+              {id === "why" ? "Why" : id === "code" ? "Code" : "Live"}
             </button>
           ))}
         </div>
 
         <div className="inspector-body">
-          {tab === 'why' ? (
+          {tab === "why" ? (
             node.why.length > 0 ? (
               <div className="prose">
                 {node.why.map((paragraph, index) => (
@@ -127,9 +142,9 @@ function InspectorPanel({
             )
           ) : null}
 
-          {tab === 'code' ? <CodeTab sources={node.sources} /> : null}
+          {tab === "code" ? <CodeTab sources={node.sources} /> : null}
 
-          {tab === 'live' ? (
+          {tab === "live" ? (
             facts.length > 0 ? (
               <FactList facts={facts} />
             ) : (
@@ -142,7 +157,7 @@ function InspectorPanel({
         </div>
       </aside>
     </>
-  )
+  );
 }
 
 export function Inspector({
@@ -150,22 +165,24 @@ export function Inspector({
   live,
   onClose,
 }: {
-  node: MapNode | null
-  live: LiveContext
-  onClose: () => void
+  node: MapNode | null;
+  live: LiveContext;
+  onClose: () => void;
 }) {
   useEffect(() => {
-    if (!node) return
+    if (!node) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
-    }
+      if (event.key === "Escape") onClose();
+    };
 
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [node, onClose])
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [node, onClose]);
 
-  if (!node) return null
+  if (!node) return null;
 
-  return <InspectorPanel key={node.id} node={node} live={live} onClose={onClose} />
+  return (
+    <InspectorPanel key={node.id} node={node} live={live} onClose={onClose} />
+  );
 }

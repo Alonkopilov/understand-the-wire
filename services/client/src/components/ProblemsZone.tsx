@@ -1,11 +1,15 @@
-import { PROBLEMS } from '../data/problems.ts'
-import { Panel, SectionHeading } from './ui.tsx'
+import { PROBLEMS } from "../data/problems.ts";
+import { Panel, SectionHeading } from "./ui.tsx";
 
-export function ProblemsZone({ onSelect }: { onSelect: (nodeId: string) => void }) {
+export function ProblemsZone({
+  onSelect,
+}: {
+  onSelect: (nodeId: string) => void;
+}) {
   // Unwritten entries are skipped rather than rendered as empty cards, so the
   // section can be filled in one at a time without ever looking broken.
-  const written = PROBLEMS.filter((problem) => problem.title.trim() !== '')
-  if (written.length === 0) return null
+  const written = PROBLEMS.filter((problem) => problem.title.trim() !== "");
+  if (written.length === 0) return null;
 
   return (
     <section className="zone" id="problems">
@@ -30,7 +34,11 @@ export function ProblemsZone({ onSelect }: { onSelect: (nodeId: string) => void 
             <p>{problem.fix}</p>
 
             {problem.nodeId ? (
-              <button type="button" className="link-button" onClick={() => onSelect(problem.nodeId as string)}>
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => onSelect(problem.nodeId as string)}
+              >
                 see it on the map
               </button>
             ) : null}
@@ -38,5 +46,5 @@ export function ProblemsZone({ onSelect }: { onSelect: (nodeId: string) => void 
         ))}
       </div>
     </section>
-  )
+  );
 }

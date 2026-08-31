@@ -1,21 +1,41 @@
-import type { Cluster, Flux } from '../lib/types.ts'
-import type { Resource } from '../lib/useResource.ts'
-import { formatRelative, shortRevision } from '../lib/format.ts'
-import { Panel, SectionHeading, Skeleton, StatusDot, Unavailable } from './ui.tsx'
+import type { Cluster, Flux } from "../lib/types.ts";
+import type { Resource } from "../lib/useResource.ts";
+import { formatRelative, shortRevision } from "../lib/format.ts";
+import {
+  Panel,
+  SectionHeading,
+  Skeleton,
+  StatusDot,
+  Unavailable,
+} from "./ui.tsx";
 
-function WorkloadRow({ name, ready, desired }: { name: string; ready: number; desired: number }) {
+function WorkloadRow({
+  name,
+  ready,
+  desired,
+}: {
+  name: string;
+  ready: number;
+  desired: number;
+}) {
   return (
     <div className="workload">
-      <StatusDot status={ready === desired && desired > 0 ? 'ok' : 'warn'} />
+      <StatusDot status={ready === desired && desired > 0 ? "ok" : "warn"} />
       <span className="mono workload-name">{name}</span>
       <span className="muted">
         {ready}/{desired}
       </span>
     </div>
-  )
+  );
 }
 
-export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Resource<Cluster> }) {
+export function FluxZone({
+  flux,
+  cluster,
+}: {
+  flux: Resource<Flux>;
+  cluster: Resource<Cluster>;
+}) {
   return (
     <section className="zone" id="gitops">
       <SectionHeading
@@ -28,9 +48,9 @@ export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Res
         <Panel>
           <h3 className="panel-title">Flux resources</h3>
 
-          {flux.status === 'loading' ? <Skeleton rows={4} /> : null}
+          {flux.status === "loading" ? <Skeleton rows={4} /> : null}
 
-          {flux.status === 'unavailable' ? (
+          {flux.status === "unavailable" ? (
             <Unavailable what="Flux" detail={flux.error} />
           ) : null}
 
@@ -40,7 +60,9 @@ export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Res
                 <p className="repo-line">
                   <span className="mono">{flux.data.repository.branch}</span>
                   <span className="muted"> · </span>
-                  <span className="mono">{shortRevision(flux.data.repository.revision)}</span>
+                  <span className="mono">
+                    {shortRevision(flux.data.repository.revision)}
+                  </span>
                 </p>
               ) : null}
 
@@ -54,17 +76,29 @@ export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Res
                 </thead>
                 <tbody>
                   {flux.data.resources.map((resource) => (
-                    <tr key={`${resource.kind}/${resource.namespace}/${resource.name}`}>
+                    <tr
+                      key={`${resource.kind}/${resource.namespace}/${resource.name}`}
+                    >
                       <td>
                         <StatusDot
-                          status={resource.suspended ? 'warn' : resource.ready ? 'ok' : 'error'}
+                          status={
+                            resource.suspended
+                              ? "warn"
+                              : resource.ready
+                                ? "ok"
+                                : "error"
+                          }
                           title={resource.message}
                         />
                         <span className="mono">{resource.name}</span>
                         <span className="muted kind"> {resource.kind}</span>
                       </td>
-                      <td className="mono">{shortRevision(resource.revision)}</td>
-                      <td className="muted">{formatRelative(resource.lastApplied)}</td>
+                      <td className="mono">
+                        {shortRevision(resource.revision)}
+                      </td>
+                      <td className="muted">
+                        {formatRelative(resource.lastApplied)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -76,9 +110,9 @@ export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Res
         <Panel>
           <h3 className="panel-title">Workloads</h3>
 
-          {cluster.status === 'loading' ? <Skeleton rows={4} /> : null}
+          {cluster.status === "loading" ? <Skeleton rows={4} /> : null}
 
-          {cluster.status === 'unavailable' ? (
+          {cluster.status === "unavailable" ? (
             <Unavailable what="The Kubernetes API" detail={cluster.error} />
           ) : null}
 
@@ -97,10 +131,12 @@ export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Res
 
               {cluster.data.nodes.map((node) => (
                 <p className="node-line" key={node.name}>
-                  <StatusDot status={node.ready ? 'ok' : 'error'} />
+                  <StatusDot status={node.ready ? "ok" : "error"} />
                   <span className="mono">{node.name}</span>
                   <span className="muted"> · {node.kubeletVersion}</span>
-                  {node.instanceType ? <span className="muted"> · {node.instanceType}</span> : null}
+                  {node.instanceType ? (
+                    <span className="muted"> · {node.instanceType}</span>
+                  ) : null}
                 </p>
               ))}
             </>
@@ -108,5 +144,5 @@ export function FluxZone({ flux, cluster }: { flux: Resource<Flux>; cluster: Res
         </Panel>
       </div>
     </section>
-  )
+  );
 }

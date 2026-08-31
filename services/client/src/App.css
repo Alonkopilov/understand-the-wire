@@ -60,11 +60,199 @@
   border: 1px solid var(--border-strong);
   background: var(--bg-raised);
   font-size: 13px;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .pill-muted {
   color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ hero -- */
+
+.hero {
+  margin: 26px 0 24px;
+  padding: 26px 24px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+
+  @media (max-width: 620px) {
+    padding: 22px 14px 18px;
+  }
+}
+
+/* The wire itself: six stops on a line, with a pulse running the length of it
+   whenever the API is answering. */
+.wire {
+  padding: 0 8px;
+}
+
+.wire-track {
+  position: relative;
+  height: 46px;
+}
+
+.wire-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--border-strong),
+    var(--accent-border),
+    var(--border-strong)
+  );
+  opacity: 0.6;
+}
+
+.hero-live .wire-line {
+  opacity: 1;
+}
+
+.wire-stop {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.wire-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: var(--bg-raised);
+  border: 2px solid var(--border-strong);
+}
+
+.hero-live .wire-dot {
+  border-color: var(--accent);
+}
+
+.wire-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  color: var(--muted);
+  white-space: nowrap;
+
+  @media (max-width: 520px) {
+    font-size: 9px;
+  }
+}
+
+.wire-pulse {
+  position: absolute;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px 3px var(--accent-bg);
+  animation: wire-travel 3.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes wire-travel {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire-pulse {
+    animation: none;
+    left: 100%;
+  }
+}
+
+.hero-readout {
+  margin-top: 22px;
+  display: grid;
+  gap: 4px;
+}
+
+.hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* The pod name is the payoff, so it gets to be the biggest thing here — but it
+   is an unbounded string, so it must be free to wrap and shrink. */
+.hero-pod {
+  justify-self: start;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: clamp(15px, 4.4vw, 26px);
+  line-height: 128%;
+  letter-spacing: -0.4px;
+  color: var(--text-h);
+  overflow-wrap: anywhere;
+  border-bottom: 1px dashed var(--accent-border);
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
+.hero-meta {
+  font-size: 12.5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.hero-stat {
+  display: grid;
+  gap: 2px;
+}
+
+.hero-stat dt {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+}
+
+.hero-stat dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-h);
+  overflow-wrap: anywhere;
 }
 
 /* ---------------------------------------------------------------- zones -- */
@@ -181,7 +369,12 @@
 .skeleton span {
   height: 12px;
   border-radius: 4px;
-  background: linear-gradient(90deg, var(--border) 25%, var(--bg-raised) 50%, var(--border) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--bg-raised) 50%,
+    var(--border) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
@@ -272,7 +465,7 @@
 }
 
 .trace-rail::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: -1px;
@@ -356,19 +549,35 @@
   fill: none;
   stroke: var(--border-strong);
   stroke-width: 1.5;
+  transition:
+    stroke 0.15s,
+    stroke-width 0.15s,
+    opacity 0.15s;
 }
 
 .map-edge-dashed {
   stroke-dasharray: 4 5;
-  opacity: 0.75;
+  opacity: 0.55;
 }
 
-.map-edges path[marker-end] {
-  marker-end: url(#arrow);
+/* With one box focused, everything it does not touch drops away, so a single
+   relationship is readable instead of twenty overlapping curves. */
+.map-edge-muted {
+  opacity: 0.06;
 }
 
-.map-edges marker path {
+.map-edge-active {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+  opacity: 1;
+}
+
+.arrow-head {
   fill: var(--border-strong);
+}
+
+.arrow-head-active {
+  fill: var(--accent);
 }
 
 .band {
@@ -438,6 +647,14 @@
 .map-node-selected {
   border-color: var(--accent);
   background: var(--accent-bg);
+}
+
+.map-node-linked {
+  border-color: var(--accent-border);
+}
+
+.map-node-dimmed {
+  opacity: 0.32;
 }
 
 .map-node-head {

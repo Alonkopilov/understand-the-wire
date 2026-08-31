@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useState } from 'react'
-import { getJson } from './api.ts'
+import { useCallback, useEffect, useState } from "react";
+import { getJson } from "./api.ts";
 
 export type Resource<T> = {
-  status: 'loading' | 'ready' | 'unavailable'
-  data: T | null
+  status: "loading" | "ready" | "unavailable";
+  data: T | null;
   /** Set while the last attempt failed but we still hold a previous result. */
-  error: string | null
-  refresh: () => void
-}
+  error: string | null;
+  refresh: () => void;
+};
 
 type InternalState<T> = {
-  status: 'loading' | 'ready' | 'unavailable'
-  data: T | null
-  error: string | null
-}
+  status: "loading" | "ready" | "unavailable";
+  data: T | null;
+  error: string | null;
+};
 
 /**
  * Fetch a JSON endpoint, optionally polling.
@@ -24,52 +24,59 @@ type InternalState<T> = {
  */
 export function useResource<T>(path: string, pollMs = 0): Resource<T> {
   const [state, setState] = useState<InternalState<T>>({
-    status: 'loading',
+    status: "loading",
     data: null,
     error: null,
-  })
-  const [nonce, setNonce] = useState(0)
+  });
+  const [nonce, setNonce] = useState(0);
 
-  const refresh = useCallback(() => setNonce((value) => value + 1), [])
+  const refresh = useCallback(() => setNonce((value) => value + 1), []);
 
   useEffect(() => {
-    const controller = new AbortController()
-    let cancelled = false
-    let timer: number | undefined
+    const controller = new AbortController();
+    let cancelled = false;
+    let timer: number | undefined;
 
-    if (!path) {
-      setState({ status: 'unavailable', data: null, error: 'nothing to load' })
-      return
-    }
+    if (!path) return;
 
     const run = async () => {
       try {
-        const data = await getJson<T>(path, controller.signal)
-        if (!cancelled) setState({ status: 'ready', data, error: null })
+        const data = await getJson<T>(path, controller.signal);
+        if (!cancelled) setState({ status: "ready", data, error: null });
       } catch (error) {
-        if (cancelled || controller.signal.aborted) return
+        if (cancelled || controller.signal.aborted) return;
 
-        const message = error instanceof Error ? error.message : 'unavailable'
+        const message = error instanceof Error ? error.message : "unavailable";
         setState((previous) =>
           previous.data === null
-            ? { status: 'unavailable', data: null, error: message }
-            : { status: 'ready', data: previous.data, error: message },
-        )
+            ? { status: "unavailable", data: null, error: message }
+            : { status: "ready", data: previous.data, error: message },
+        );
       }
 
       if (!cancelled && pollMs > 0) {
-        timer = window.setTimeout(run, pollMs)
+        timer = window.setTimeout(run, pollMs);
       }
-    }
+    };
 
-    void run()
+    void run();
 
     return () => {
-      cancelled = true
-      controller.abort()
-      if (timer !== undefined) window.clearTimeout(timer)
-    }
-  }, [path, pollMs, nonce])
+      cancelled = true;
+      controller.abort();
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, [path, pollMs, nonce]);
 
-  return { ...state, refresh }
+  // Derived during render rather than written from the effect: an empty path
+  // means there is nothing to fetch, which is knowable without a round trip.
+  if (!path)
+    return {
+      status: "unavailable",
+      data: null,
+      error: "nothing to load",
+      refresh,
+    };
+
+  return { ...state, refresh };
 }
