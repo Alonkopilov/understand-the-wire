@@ -67,5 +67,5 @@ def source(path: str):
         "path": path,
         "language": get_language(path),
         "content": data["content"],
-        "url": data["browser_url"]
+        "url": data["url"]
     }
