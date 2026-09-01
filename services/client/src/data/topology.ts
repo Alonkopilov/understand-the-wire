@@ -347,7 +347,10 @@ export const NODES: MapNode[] = [
     sublabel: "utw-prod-private-ec2-sg",
     layer: "network",
     row: 4,
-    why: [],
+    why: [
+      "Dictates what inbound/outbound traffic is allowed for an AWS resource.",
+      "In the case of my ec2 nodes, the only traffic I needed to allow is inbound connections from the ALB and outbound connections to 0.0.0.0/0, which is crucial to allow the nodes to access the internet.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/control-plane-node/security-groups.tf",
@@ -363,7 +366,13 @@ export const NODES: MapNode[] = [
     sublabel: "m7i-flex.large · AL2023",
     layer: "compute",
     row: 0,
-    why: [],
+    why: [
+      "The actual EC2 server running the Kubernetes cluster.",
+      "When the instance is provisioned, a shell script runs on startup (init-control-plane.sh.tpl) that installs everything the control plane needs.",
+      "The installation includes: Creating the K3S cluster, configured with a custom ServiceAccount private signing key to support my custom OIDC issuer (more on that in the 'Identity & secrets' section). Moreover, installing FluxCD for GitOps, pointing it to my repo, and fetching relevant secrets from AWS Parameter Store.",
+      "The instance is configured with IAM permissions to fetch specific secrets, upload the OIDC files to the OIDC S3 Bucket and start sessions with the AWS SSM Session Manager for remote access.",
+      "About the instance type - it currently runs 'm7i-flex.large', which is essential to run all of my workloads safely with CPU and memory headroom. It started small with a free tier 't3.small', but even though K3S is lightweight, when you deploy Flux, Prometheus stack, External Secrets and two services, it does not have sufficient resources.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/control-plane-node/main.tf",
@@ -400,7 +409,13 @@ export const NODES: MapNode[] = [
     sublabel: "single node · custom OIDC issuer",
     layer: "compute",
     row: 0,
-    why: [],
+    why: [
+      "K3S is a Lightweight Kubernetes distribution, bundled in one binary. It is easy to install, very light on resources and comes with the Traefik ingress controller.",
+      "The biggest choice in this project was choosing a self-managed cluster with K3S vs managed cluster with AWS EKS. The following are the tradeoffs and advantages I personally had to experience when building this project:",
+      "1. The price - Running EKS is very expensive, coming to about 73$ just for the control plane, meaning that you have to also pay for the nodes themselves separately. One of my goals for this project was to deploy a Kubernetes cluster and run actual production workloads on it, but the price for EKS was way above my budget. Compare that with K3S where the control plane runs on the instance you provision.",
+      "2. Operational Overhead - Giving up on EKS has a price, all of the convenience you get is yours to manage. For example: installing the control plane, configuring a custom OIDC issuer if you want IRSA in pods for short-term credentials. Also, configuring the Ingress controller, the Load Balancer integration, IAM, control plane failures... and more.",
+      "3. Learning Opportunities - If learning is one of your goals, using EKS means missing out on a lot of the Kubernetes internal mechanisms that AWS manages for you. You obviously don't need to know everything, but experiencing some of those first hand helped me understand things in my work clusters that 'just work' that I took for granted.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/control-plane-node/init-control-plane.sh.tpl",
@@ -414,7 +429,9 @@ export const NODES: MapNode[] = [
     sublabel: "k3s default ingress controller",
     layer: "compute",
     row: 0,
-    why: [],
+    why: [
+      "Ingress Controller that comes pre-installed with the K3S Kubernetes distribution. It allows to route requests coming to the cluster to the correct pods based on ingress rules that you define.",
+    ],
     sources: [
       {
         path: "k8s/apps/frontend/ingress.yaml",
@@ -430,7 +447,12 @@ export const NODES: MapNode[] = [
     sublabel: "branch develop · path ./k8s",
     layer: "cluster",
     row: 0,
-    why: [],
+    why: [
+      "The Git Repository hosting this project.",
+      "My goal with this project was to show not just the ability in provisioning and managing production infrastructure/services, but to also demonstrate that I can connect all the parts with a scalable architecture that supports consistent multi-environment clusters (dev, staging, prod).",
+      "That's why I decided to have everything in one repository - the infra configuration, the k8s manifests and the services themselves. Moreover, GitHub was used simply because I have most of my projects there, and it provides good CI and Image Registry that I have experience with at work.",
+      "FluxCD is configured to point at this repo.",
+    ],
     sources: [
       {
         path: "k8s/clusters/prod/flux-system/gotk-sync.yaml",
@@ -444,7 +466,12 @@ export const NODES: MapNode[] = [
     sublabel: "GitOps reconciliation",
     layer: "cluster",
     row: 0,
-    why: [],
+    why: [
+      "This is a GitOps CD tool that allows to manage the Kubernetes cluster manifests using Git as the source of truth.",
+      "There was nothing manual that was applied to my cluster, what you see in my Git repo exactly what is applied. In team development environments it allows for clarity in what's in the cluster, and if something was changed you can see what, when and who.",
+      "Moreover, using the 'image.toolkit' Flux CRDs (ImageRepository, ImagePolicy, ImageUpdateAutomation), you can point images in deployment manifests at an image registry, have Flux scan the registry for new images, automatically updating the image version in the manifests and committing them to git.",
+      "*Note* - Why did I choose Flux and not Argo? Both tools are great, but we specifically use Flux at work, and one of my personal goals for this project was to be able to reproduce it.",
+    ],
     sources: [
       {
         path: "k8s/clusters/prod/infrastructure-configs.yaml",
@@ -465,7 +492,16 @@ export const NODES: MapNode[] = [
     sublabel: "external-secrets · kube-prometheus-stack",
     layer: "cluster",
     row: 1,
-    why: [],
+    why: [
+      "The controllers are mostly Helm Charts the cluster needs for some workloads and provide Kubernetes CRDs.",
+      "This is best explained by looking at my Kubernetes directory structure:",
+      "[apps/] - Manifests of the client and servers services.",
+      "[clusters/(dev,stg,prod)/] - Manifests unique to the cluster environment (env vars, apply order).",
+      "[infrastructure/controllers/] - Manifests for Helm Charts and installations (You are here).",
+      "[infrastructure/configs/] - Configuration manifests for the cluster workloads.",
+      "The structure is deliberate, and allows me to separate concerns and especially the apply order with Flux 'dependsOn' (cluster -> controllers -> configs -> apps).",
+      "Because the cluster can't apply manifests using custom CRDs before they are installed, this apply order is crucial.",
+    ],
     sources: [
       {
         path: "k8s/infrastructure/controllers/helm-external-secrets.yaml",
@@ -483,7 +519,16 @@ export const NODES: MapNode[] = [
     sublabel: "ClusterSecretStore · ExternalSecret",
     layer: "cluster",
     row: 1,
-    why: [],
+    why: [
+      "This directory contains configuration manifests that the cluster needs. it configures mainly external secrets.",
+      "This is best explained by looking at my Kubernetes directory structure:",
+      "[apps/] - Manifests of the client and servers services.",
+      "[clusters/(dev,stg,prod)/] - Manifests unique to the cluster environment (env vars, apply order).",
+      "[infrastructure/controllers/] - Manifests for Helm Charts and installations.",
+      "[infrastructure/configs/] - Configuration manifests for the cluster workloads. (You are here)",
+      "The structure is deliberate, and allows me to separate concerns and especially the apply order with Flux 'dependsOn' (cluster -> controllers -> configs -> apps).",
+      "Because the cluster can't apply manifests using custom CRDs before they are installed, this apply order is crucial.",
+    ],
     sources: [
       {
         path: "k8s/infrastructure/configs/cluster-secret-store.yaml",
@@ -501,7 +546,16 @@ export const NODES: MapNode[] = [
     sublabel: "this frontend · the API behind it",
     layer: "cluster",
     row: 1,
-    why: [],
+    why: [
+      "This directory contains the Kubernetes manifests of the actual client and server services in this repo.",
+      "This is best explained by looking at my Kubernetes directory structure:",
+      "[apps/] - Manifests of the client and servers services. (You are here)",
+      "[clusters/(dev,stg,prod)/] - Manifests unique to the cluster environment (env vars, apply order).",
+      "[infrastructure/controllers/] - Manifests for Helm Charts and installations.",
+      "[infrastructure/configs/] - Configuration manifests for the cluster workloads.",
+      "The structure is deliberate, and allows me to separate concerns and especially the apply order with Flux 'dependsOn' (cluster -> controllers -> configs -> apps).",
+      "Because the cluster can't apply manifests using custom CRDs before they are installed, this apply order is crucial.",
+    ],
     sources: [
       {
         path: "k8s/apps/frontend/deployment.yaml",
@@ -528,7 +582,12 @@ export const NODES: MapNode[] = [
     sublabel: "public S3 · JWKS + discovery doc",
     layer: "identity",
     row: 0,
-    why: [],
+    why: [
+      "Public S3 Bucket in AWS that hosts the OIDC discovery files of the cluster. It contains the '.well-known/openid-configuration' and 'openid/v1/jwks' files. The bucket's URL is registered as a trusted OIDC issuer.",
+      "*Background - why do I even need this?* - Some configurations and workloads the cluster runs require secrets that sit in AWS Parameter Store. In order for pods to access them, they need a Service Account connected to them with a role for authorization, and for authentication they need an AWS token. Now, the easiest way to do this is to create an AWS token and put it in my manifest. But it's more secure to use short-term access tokens, that the pod can issue on demand, and expire after a short time.",
+      "That lead me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
+      "How does AWS verify the request actually came from my cluster? - As I said earlier, the cluster signs JWT tokens with a private RSA key that is generated in my instance startup script. A public key is also generated that can be used to verify the cluster signature - that's the key part (pun intended), I need to make that public key accessible to AWS STS so it can verify the pod. The public key is uploaded in the OIDC discovery standard format to the S3 bucket, and it's public so that AWS can easily access it, it does not contain any sensitive values.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/oidc-bucket/main.tf",
