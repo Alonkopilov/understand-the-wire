@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: ghcr.io/alonkopilov/understand-the-wire-client-prod:20260831-100104 # {"$imagepolicy": "flux-system:client-imagepolicy"}
+        image: ghcr.io/alonkopilov/understand-the-wire-client-prod:20260901-172343 # {"$imagepolicy": "flux-system:client-imagepolicy"}
         resources:
           limits:
             memory: 128Mi
