@@ -77,6 +77,18 @@ I created VPC endpoints to allow internal connection between AWS and my instance
 
 **How did I solve it? -** I forgot to add a custom disk to my instance, so it got a default 8GB storage, which is not enough at all. I bumped up the storage to 30GB by creating a gp3 SSD in Terraform for the instance.
 
+---
+
+### How can pods access AWS services?
+
+**What happened? -** 
+
+**What it looked like? -** 
+
+**What it turned out to be? -** 
+
+**How did I solve it? -**  -->
+
 <!-- ### Dealing with Spot instances
 **What happened? -** 
 

@@ -587,6 +587,7 @@ export const NODES: MapNode[] = [
       "*Background - why do I even need this?* - Some configurations and workloads the cluster runs require secrets that sit in AWS Parameter Store. In order for pods to access them, they need a Service Account connected to them with a role for authorization, and for authentication they need an AWS token. Now, the easiest way to do this is to create an AWS token and put it in my manifest. But it's more secure to use short-term access tokens, that the pod can issue on demand, and expire after a short time.",
       "That lead me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
       "How does AWS verify the request actually came from my cluster? - As I said earlier, the cluster signs JWT tokens with a private RSA key that is generated in my instance startup script. A public key is also generated that can be used to verify the cluster signature - that's the key part (pun intended), I need to make that public key accessible to AWS STS so it can verify the pod. The public key is uploaded in the OIDC discovery standard format to the S3 bucket, and it's public so that AWS can easily access it, it does not contain any sensitive values.",
+      "Why is it so complicated? - Once you understand the mechanism its not that bad, but as I documented in other sections, this is one of the parts that EKS completely does for you out of the box.",
     ],
     sources: [
       {
@@ -605,7 +606,13 @@ export const NODES: MapNode[] = [
     sublabel: "trusts the cluster issuer",
     layer: "identity",
     row: 0,
-    why: [],
+    why: [
+      "Registers the URL of the S3 OIDC Bucket as a trusted provider for granting short-term tokens. Once it is set up, it is possible for pod service accounts to assume IAM roles that were specifically signed by that provider.",
+      "*Background - why do I even need this?* - Some configurations and workloads the cluster runs require secrets that sit in AWS Parameter Store. In order for pods to access them, they need a Service Account connected to them with a role for authorization, and for authentication they need an AWS token. Now, the easiest way to do this is to create an AWS token and put it in my manifest. But it's more secure to use short-term access tokens, that the pod can issue on demand, and expire after a short time.",
+      "That lead me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
+      "How does AWS verify the request actually came from my cluster? - As I said earlier, the cluster signs JWT tokens with a private RSA key that is generated in my instance startup script. A public key is also generated that can be used to verify the cluster signature - that's the key part (pun intended), I need to make that public key accessible to AWS STS so it can verify the pod. The public key is uploaded in the OIDC discovery standard format to the S3 bucket, and it's public so that AWS can easily access it, it does not contain any sensitive values.",
+      "Why is it so complicated? - Once you understand the mechanism its not that bad, but as I documented in other sections, this is one of the parts that EKS completely does for you out of the box.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/oidc-bucket/main.tf",
@@ -623,7 +630,10 @@ export const NODES: MapNode[] = [
     sublabel: "one role per service account",
     layer: "identity",
     row: 1,
-    why: [],
+    why: [
+      "Regular AWS IAM roles, but with a trust policy configured to allow my custom OIDC provider (described in the OIDC section) as a trusted principal - instead of the usual trust relationship with an AWS service or account.",
+      "In this project, I use this to give pods fine-grained, least-privilege access to specific AWS services. For example, External Secrets Operator gets a role that can only read specific paths in Parameter Store.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/service-account/main.tf",
@@ -638,7 +648,10 @@ export const NODES: MapNode[] = [
     sublabel: "/utw/prod/*",
     layer: "identity",
     row: 1,
-    why: [],
+    why: [
+      "AWS Service to store and manage parameters and sensitive data. In this project it is used to securely store secrets, like GitHub API keys, Discord webhook for alerts and Grafana credentials.",
+      "Parameter access is protected behind IAM roles, which allows fine grained access to them.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/parameter-store/main.tf",
@@ -653,7 +666,10 @@ export const NODES: MapNode[] = [
     sublabel: "SSM + scoped reads",
     layer: "identity",
     row: 1,
-    why: [],
+    why: [
+      "When an AWS EC2 instance is created, it is automatically assigned an IAM role called the 'instance role'. The permissions that are given to the instance role apply to every request coming out of it, meaning that if I give it a permission to access a secret, every single pod automatically gets that access too.",
+      "It is important to specify very specific permissions that the node has to have, and have other permissions scoped to the smallest unit possible for the best security.",
+    ],
     sources: [
       {
         path: "infrastructure/modules/control-plane-node/iam.tf",
