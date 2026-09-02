@@ -84,10 +84,11 @@ function App() {
         />
 
         <p className="standfirst">
-          "Infrastructure as Code" in AWS declared entirely in Terraform:
-          powering a K3S cluster running on EC2 instances inside private
-          subnets. The cluster is GitOps friendly with FluxCD, and written with
-          scalability in mind to allow multiple environments.
+          A fully self-hosted AWS + Kubernetes stack, built with best practices and scalability and multi-environment in mind.
+          Every layer - VPC networking, a k3s cluster running on EC2 in private subnets, 
+          GitOps delivery via FluxCD, and even a self-hosted IRSA for pod-level IAM identity - was built,
+          broken, and connected together by hand. The goal wasn't just to get a website running,
+          it was to know exactly why every piece works, and how the whole wire is connected.
         </p>
       </header>
 
@@ -104,14 +105,14 @@ function App() {
           configurations and the Python backend service to power this website{" "}
           <b>were written completely on my own</b>, following best practices
           from my own personal experience, as well as my own research using
-          LLMs, videos, articles.
+          LLMs, videos and articles.
           <br />
           <br />
-          The code for the <b>frontend service only</b>, was written using
+          The code for the <b>frontend service</b> was written using
           Claude Code (Opus 5)
         </p>
         <p>
-          All of it — infrastructure, manifests and this app — lives in{" "}
+          All of it - infrastructure, manifests and this app - lives in{" "}
           <a href={REPO_URL} target="_blank" rel="noreferrer">
             one repository
           </a>

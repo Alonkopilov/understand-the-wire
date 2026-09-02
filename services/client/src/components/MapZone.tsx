@@ -180,7 +180,7 @@ export function MapZone({
       <SectionHeading
         eyebrow="02 — The map"
         title="Everything Terraform builds"
-        lede="Solid lines carry requests. Dashed lines are control-plane relationships — trust, reconciliation, secret reads. Hover any box to isolate what it connects to; select it to see why it exists and the code that creates it."
+        lede="Solid lines carry requests. Dashed lines are control-plane relationships - trust, reconciliation, secret reads. Hover any box to isolate what it connects to; select it to see why it exists and the code that creates it."
       />
 
       <div

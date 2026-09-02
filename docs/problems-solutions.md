@@ -79,21 +79,22 @@ I created VPC endpoints to allow internal connection between AWS and my instance
 
 ---
 
-### How can pods access AWS services?
+### How can pods access AWS with short-term tokens on K3S?
 
-**What happened? -** 
+**What happened? -** Some configurations and workloads the cluster runs require secrets that sit in AWS Parameter Store. In order for pods to access them, they need a Service Account connected to them with a role for authorization, and for authentication they need an AWS token. Now, the easiest way to do this is to create an AWS token and put it in my manifest. But it's more secure to use short-term access tokens, that the pod can issue on demand, and expire after a short time.
 
-**What it looked like? -** 
+**What it looked like? -** That lead me to the second option which is using IRSA with a custom OIDC provider. The problem started when I realized compared to a self-managed K3S cluster, the managed option AWS EKS does it all for you, all you needed was a simple 'eks.amazonaws.com/role-arn' annotation, and the OIDC provider is already set up for you by defualt.
 
-**What it turned out to be? -** 
+**How did I solve it? -** The only way is to host your own OIDC provider: When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.
 
-**How did I solve it? -**  -->
+How does AWS verify the request actually came from my cluster? - As I said earlier, the cluster signs JWT tokens with a private RSA key that is generated in my instance startup script. A public key is also generated that can be used to verify the cluster signature - that's the key part (pun intended), I need to make that public key accessible to AWS STS so it can verify the pod. The public key is uploaded in the OIDC discovery standard format to the S3 bucket, and it's public so that AWS can easily access it, it does not contain any sensitive values.
 
-<!-- ### Dealing with Spot instances
-**What happened? -** 
+---
 
-**What it looked like? -** 
+### How to get the availability zone of the pod?
 
-**What it turned out to be? -** 
+**What happened? -** EKS is very integrated, worker nodes and pods running in it are populated with useful labels. One of them is the availability zone of nodes, which is a simple label called "topology.kubernetes.io/zone". In a self-managed K3S cluster this label does not exist.
 
-**How did I solve it? -**  -->
+**What it looked like? -** I needed to show the zone in my client, so I used the Kubernetes API server to get that label from the pod, and it just didn't exist.
+
+**How did I solve it? -** Because I wanted to show the zone on my website, I had to get the information from AWS itself using the AWS API.

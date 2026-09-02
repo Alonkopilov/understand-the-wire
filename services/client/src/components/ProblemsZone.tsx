@@ -16,7 +16,7 @@ export function ProblemsZone({
       <SectionHeading
         eyebrow="04 — What went wrong"
         title="The parts that did not work first time"
-        lede="Every one of these cost more time than the thing it was blocking. They are the reason the configuration looks the way it does."
+        lede="Every one of these were documented on the way to build this project, problems and dillemas I had to face."
       />
 
       <div className="problems">
