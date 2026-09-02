@@ -889,6 +889,11 @@
   line-height: 158%;
 }
 
+.prose strong {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
 .file-tabs {
   display: flex;
   gap: 6px;

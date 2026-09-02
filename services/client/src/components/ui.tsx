@@ -81,6 +81,42 @@ export function FactList({ facts }: { facts: Fact[] }) {
   );
 }
 
+/**
+ * Matches an `*emphasised*` span. Deliberately not markdown: the only marker
+ * the prose uses is a lead-in label ("*Important Note* - ..."), and the same
+ * prose is full of globs (`al2023-ami-*-x86_64`, `/utw/prod/*`) that have to
+ * survive as written. So an opener has to follow a space or a bracket, the span
+ * has to open on a letter or digit, and it has to close before a space or
+ * punctuation. Anything else is left as a literal asterisk.
+ */
+const EMPHASIS = /(^|[\s(])\*([\p{L}\p{N}][^*]*?)\*(?=$|[\s.,;:!?)])/gu;
+
+function emphasise(text: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+
+  for (const match of text.matchAll(EMPHASIS)) {
+    const open = match.index + match[1].length;
+    if (open > cursor) parts.push(text.slice(cursor, open));
+    parts.push(<strong key={open}>{match[2]}</strong>);
+    cursor = open + match[2].length + 2;
+  }
+
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  return parts;
+}
+
+/** One paragraph per entry, with `*...*` rendered bold. */
+export function Prose({ paragraphs }: { paragraphs: string[] }) {
+  return (
+    <div className="prose">
+      {paragraphs.map((paragraph, index) => (
+        <p key={index}>{emphasise(paragraph)}</p>
+      ))}
+    </div>
+  );
+}
+
 export function Skeleton({ rows = 3 }: { rows?: number }) {
   return (
     <div className="skeleton" aria-hidden="true">

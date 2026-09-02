@@ -3,7 +3,7 @@ import type { LiveContext, SourceFile } from "../lib/types.ts";
 import type { MapNode, SourceRef } from "../data/topology.ts";
 import { languageFor } from "../lib/api.ts";
 import { useResource } from "../lib/useResource.ts";
-import { CodeBlock, FactList, Skeleton, Unavailable } from "./ui.tsx";
+import { CodeBlock, FactList, Prose, Skeleton, Unavailable } from "./ui.tsx";
 
 type Tab = "why" | "code" | "live";
 
@@ -132,11 +132,7 @@ function InspectorPanel({
         <div className="inspector-body">
           {tab === "why" ? (
             node.why.length > 0 ? (
-              <div className="prose">
-                {node.why.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </div>
+              <Prose paragraphs={node.why} />
             ) : (
               <p className="muted">Not written yet.</p>
             )
