@@ -21,14 +21,10 @@ resource "cloudflare_dns_record" "validation" {
   ttl     = 60
 }
 
-locals {
-  env_suffix = var.environment == "prod" ? "" : ".${var.environment}"
-}
-
 resource "cloudflare_dns_record" "alb" {
   zone_id = var.zone_id
 
-  name    = "www${local.env_suffix}"
+  name    = "www.${var.domain}"
   type    = "CNAME"
   content = var.alb_dns_name
   proxied = false
@@ -38,7 +34,7 @@ resource "cloudflare_dns_record" "alb" {
 resource "cloudflare_dns_record" "alb_grafana" {
   zone_id = var.zone_id
 
-  name    = "grafana${local.env_suffix}"
+  name    = "grafana.${var.domain}"
   type    = "CNAME"
   content = var.alb_dns_name
   proxied = false

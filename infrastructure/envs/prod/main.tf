@@ -1,6 +1,7 @@
 locals {
   name_prefix           = "${var.project}-${var.environment}"
   parameter_name_prefix = "/${var.project}/${var.environment}"
+  env_domain            = var.environment == "prod" ? var.domain : "${var.environment}.${var.domain}"
 }
 
 # Constructs a VPC, private and public subnets, internet gateway and routing.
@@ -71,7 +72,7 @@ module "control_plane_node" {
 module "acm" {
   source = "../../modules/acm"
 
-  full_domain = var.domain
+  domain = local.env_domain
 }
 
 # Creates the DNS records for my domain + the validation records to verify the
@@ -79,7 +80,7 @@ module "acm" {
 module "cloudflare_dns" {
   source = "../../modules/cloudflare"
 
-  environment        = var.environment
+  domain             = local.env_domain
   zone_id            = var.cloudflare_zone_id
   alb_dns_name       = module.alb.alb_dns_name
   validation_records = module.acm.validation_records

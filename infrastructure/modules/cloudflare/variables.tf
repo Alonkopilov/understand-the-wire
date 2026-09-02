@@ -12,6 +12,6 @@ variable "validation_records" {
   description = "The validation records to create for the DNS name"
 }
 
-variable "environment" {
+variable "domain" {
   type = string
 }
