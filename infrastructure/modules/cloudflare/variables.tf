@@ -11,3 +11,7 @@ variable "alb_dns_name" {
 variable "validation_records" {
   description = "The validation records to create for the DNS name"
 }
+
+variable "environment" {
+  type = string
+}

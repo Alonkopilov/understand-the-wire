@@ -79,6 +79,7 @@ module "acm" {
 module "cloudflare_dns" {
   source = "../../modules/cloudflare"
 
+  environment        = var.environment
   zone_id            = var.cloudflare_zone_id
   alb_dns_name       = module.alb.alb_dns_name
   validation_records = module.acm.validation_records
