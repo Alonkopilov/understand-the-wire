@@ -56,7 +56,7 @@ export const NODES: MapNode[] = [
     layer: "edge",
     row: 0,
     why: [
-      "You guessed it, its you.",
+      "You guessed it, it's you.",
       "The person visiting this website from the browser. You just finished typing 'www.understand-the-wire.com', and pressed Enter.",
     ],
     sources: [],
@@ -92,7 +92,7 @@ export const NODES: MapNode[] = [
       "Where does AWS get the certificate? - It is the one that holds it. The certificate for 'under...com' is created in AWS ACM, but it still means nothing on its own, because everyone can create a certificate for anything, if it is actually verified is a different thing.",
       "How did I verify the certificate? - AWS ACM gives me DNS validation records, that I have to set in Cloudflare where I host my domain. If they are set, it means that I actually control the domain and AWS signs this certificate.",
       "The browser sees that the certificate is signed by the AWS Root CA and it is one of the CAs it trusts, allowing me to have HTTPS.",
-      "This whole process is completely mananged in my Terraform and happens automatically!",
+      "This whole process is completely managed in my Terraform and happens automatically!",
     ],
     sources: [
       { path: "infrastructure/modules/acm/main.tf", label: "acm/main.tf" },
@@ -243,7 +243,7 @@ export const NODES: MapNode[] = [
     row: 2,
     why: [
       "Dictates what inbound/outbound traffic is allowed for an AWS resource.",
-      "In the case of the ALB, I wanted it to be accessed from the internet using HTTP only. I created a security group to allow only inbound and outbound with port 80 and port 443.",
+      "In the case of the ALB, I wanted it to be accessed from the internet using HTTP and HTTPS only. I created a security group to allow only inbound and outbound with port 80 and port 443.",
     ],
     sources: [
       {
@@ -444,7 +444,7 @@ export const NODES: MapNode[] = [
   {
     id: "github",
     label: "GitHub repository",
-    sublabel: "branch develop · path ./k8s",
+    sublabel: "branch master · path ./k8s",
     layer: "cluster",
     row: 0,
     why: [
@@ -468,7 +468,7 @@ export const NODES: MapNode[] = [
     row: 0,
     why: [
       "This is a GitOps CD tool that allows to manage the Kubernetes cluster manifests using Git as the source of truth.",
-      "There was nothing manual that was applied to my cluster, what you see in my Git repo exactly what is applied. In team development environments it allows for clarity in what's in the cluster, and if something was changed you can see what, when and who.",
+      "There was nothing manual that was applied to my cluster, what you see in my Git repo is exactly what is applied. In team development environments it allows for clarity in what's in the cluster, and if something was changed you can see what, when and who.",
       "Moreover, using the 'image.toolkit' Flux CRDs (ImageRepository, ImagePolicy, ImageUpdateAutomation), you can point images in deployment manifests at an image registry, have Flux scan the registry for new images, automatically updating the image version in the manifests and committing them to git.",
       "*Note* - Why did I choose Flux and not Argo? Both tools are great, but we specifically use Flux at work, and one of my personal goals for this project was to be able to reproduce it.",
     ],
@@ -520,7 +520,7 @@ export const NODES: MapNode[] = [
     layer: "cluster",
     row: 1,
     why: [
-      "This directory contains configuration manifests that the cluster needs. it configures mainly external secrets.",
+      "This directory contains configuration manifests that the cluster needs. It configures mainly external secrets.",
       "This is best explained by looking at my Kubernetes directory structure:",
       "[apps/] - Manifests of the client and servers services.",
       "[clusters/(dev,stg,prod)/] - Manifests unique to the cluster environment (env vars, apply order).",
@@ -585,9 +585,9 @@ export const NODES: MapNode[] = [
     why: [
       "Public S3 Bucket in AWS that hosts the OIDC discovery files of the cluster. It contains the '.well-known/openid-configuration' and 'openid/v1/jwks' files. The bucket's URL is registered as a trusted OIDC issuer.",
       "*Background - why do I even need this?* - Some configurations and workloads the cluster runs require secrets that sit in AWS Parameter Store. In order for pods to access them, they need a Service Account connected to them with a role for authorization, and for authentication they need an AWS token. Now, the easiest way to do this is to create an AWS token and put it in my manifest. But it's more secure to use short-term access tokens, that the pod can issue on demand, and expire after a short time.",
-      "That lead me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
+      "That led me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
       "How does AWS verify the request actually came from my cluster? - As I said earlier, the cluster signs JWT tokens with a private RSA key that is generated in my instance startup script. A public key is also generated that can be used to verify the cluster signature - that's the key part (pun intended), I need to make that public key accessible to AWS STS so it can verify the pod. The public key is uploaded in the OIDC discovery standard format to the S3 bucket, and it's public so that AWS can easily access it, it does not contain any sensitive values.",
-      "Why is it so complicated? - Once you understand the mechanism its not that bad, but as I documented in other sections, this is one of the parts that EKS completely does for you out of the box.",
+      "Why is it so complicated? - Once you understand the mechanism it's not that bad, but as I documented in other sections, this is one of the parts that EKS completely does for you out of the box.",
     ],
     sources: [
       {
@@ -609,9 +609,9 @@ export const NODES: MapNode[] = [
     why: [
       "Registers the URL of the S3 OIDC Bucket as a trusted provider for granting short-term tokens. Once it is set up, it is possible for pod service accounts to assume IAM roles that were specifically signed by that provider.",
       "*Background - why do I even need this?* - Some configurations and workloads the cluster runs require secrets that sit in AWS Parameter Store. In order for pods to access them, they need a Service Account connected to them with a role for authorization, and for authentication they need an AWS token. Now, the easiest way to do this is to create an AWS token and put it in my manifest. But it's more secure to use short-term access tokens, that the pod can issue on demand, and expire after a short time.",
-      "That lead me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
+      "That led me to the second option which is using IRSA with a custom OIDC provider. When you create a Service Account for a pod, the cluster signs a JWT token for it, that I configured its issuer to be the cluster itself, the audience to be AWS STS and the sub to be the service account name. In order for AWS to let the pod have a short-term token, it needs to verify that the JWT it presents was actually signed by my cluster.",
       "How does AWS verify the request actually came from my cluster? - As I said earlier, the cluster signs JWT tokens with a private RSA key that is generated in my instance startup script. A public key is also generated that can be used to verify the cluster signature - that's the key part (pun intended), I need to make that public key accessible to AWS STS so it can verify the pod. The public key is uploaded in the OIDC discovery standard format to the S3 bucket, and it's public so that AWS can easily access it, it does not contain any sensitive values.",
-      "Why is it so complicated? - Once you understand the mechanism its not that bad, but as I documented in other sections, this is one of the parts that EKS completely does for you out of the box.",
+      "Why is it so complicated? - Once you understand the mechanism it's not that bad, but as I documented in other sections, this is one of the parts that EKS completely does for you out of the box.",
     ],
     sources: [
       {
