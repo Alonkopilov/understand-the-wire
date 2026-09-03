@@ -12,7 +12,7 @@ This is not just another project stacked up by tutorials. This is **production r
 This project is **fully ephemeral** - it is destroyed every night and rebuilt from scratch every morning - ALB, Networking, NAT, DNS certificates and validation, self-hosted OIDC provider and much more - completely automatic. **This whole repository is the source of truth.** 
 
 <p align="center">
-  <img src="./docs/architecture.svg" width="100%" alt="Architecture diagram">
+  <img src="./docs/architecture.png" width="100%" alt="Architecture diagram">
 </p>
 
 ## Understand the Wire features:
