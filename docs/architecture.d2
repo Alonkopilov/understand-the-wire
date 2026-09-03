@@ -1,0 +1,200 @@
+vars: { d2-config: { layout-engine: elk } }
+
+grid-rows: 2
+style.stroke: transparent
+
+main: "" {
+  grid-columns: 2
+  style.stroke: transparent
+
+  side: "" {
+    grid-rows: 4
+    style.stroke: transparent
+
+    iac: Infrastructure as Code {
+      direction: right
+      style.stroke: "#8250df"
+      style.font-size: 30
+      tf: Terraform { shape: image; icon: ./icons/terraform.png }
+      net: VPC · subnets · routing
+      comp: EC2 · ALB · NAT · IGW
+      sec: ACM · S3 · IAM · SSM
+      tf -> net: apply { style.stroke: "#8250df" }
+      tf -> comp: apply { style.stroke: "#8250df" }
+      tf -> sec: apply { style.stroke: "#8250df" }
+    }
+
+    pipeline: CI/CD Pipeline {
+      direction: right
+      style.stroke: "#1f6feb"
+      style.font-size: 30
+      repo: Repository { shape: image; icon: ./icons/github.png }
+      act: GitHub Actions { shape: image; icon: ./icons/actions.png }
+      reg: GHCR { shape: image; icon: ./icons/ghcr.png }
+      repo -> act -> reg
+    }
+
+    gitops: GitOps (Flux) {
+      direction: right
+      style.stroke: "#bc4c00"
+      style.font-size: 30
+      fl: Flux { shape: image; icon: ./icons/flux.png }
+      c1: controllers
+      c2: configs
+      c3: apps
+      fl -> c1 -> c2 -> c3: dependsOn { style.stroke: "#bc4c00" }
+    }
+  }
+
+  aws: AWS Cloud  ·  eu-central-1 {
+    direction: right
+    style.stroke: "#232f3e"
+    style.font-size: 30
+
+    acm: ACM certificate { shape: image; icon: ./icons/acm.png }
+
+    vpc: VPC {
+      style.font-size: 30
+      direction: right
+      pub: Public subnets  ·  2 AZs {
+        style.font-size: 30
+        direction: right
+        igw: Internet Gateway { shape: image; icon: ./icons/igw.png }
+        alb: Application Load Balancer { shape: image; icon: ./icons/alb.png }
+        nat: NAT Gateway  (egress) { shape: image; icon: ./icons/nat.png }
+      }
+      priv: Private subnet {
+        style.font-size: 30
+        direction: right
+        node: Control-plane node { shape: image; icon: ./icons/ec2.png }
+
+        k3s: k3s {
+          style.font-size: 30
+          direction: right
+          tr: Traefik  ·  ingress controller { shape: image; icon: ./icons/traefik.png }
+
+          utw: namespace  understand-the-wire {
+            style.font-size: 30
+            client: client {
+              style.font-size: 30
+              direction: right
+              i: Ingress  / { shape: image; icon: ./icons/ing.png }
+              s: Service  :80 { shape: image; icon: ./icons/svc.png }
+              d: Deployment { shape: image; icon: ./icons/deploy.png }
+              i -> s -> d
+            }
+            server: server {
+              style.font-size: 30
+              direction: right
+              i: Ingress  /api { shape: image; icon: ./icons/ing.png }
+              s: Service  :8000 { shape: image; icon: ./icons/svc.png }
+              d: Deployment { shape: image; icon: ./icons/deploy.png }
+              a: ServiceAccount  (IRSA) { shape: image; icon: ./icons/sa.png }
+              i -> s -> d -> a
+            }
+          }
+
+          eso: external-secrets  (IRSA) { shape: image; icon: ./icons/sa.png }
+          fx: Flux { shape: image; icon: ./icons/flux.png }
+        }
+      }
+    }
+
+    id: Identity  ·  IRSA {
+      style.font-size: 30
+      direction: right
+      b: OIDC discovery bucket { shape: image; icon: ./icons/s3.png }
+      p: IAM OIDC provider { shape: image; icon: ./icons/iam-role.png }
+      s: Parameter Store { shape: image; icon: ./icons/ssm.png }
+      b -> p -> s
+    }
+
+    vpc.pub.igw -> vpc.pub.alb
+    vpc.pub.alb -> vpc.priv.node
+    vpc.priv.node -> vpc.priv.k3s.tr
+    vpc.priv.k3s.tr -> vpc.priv.k3s.utw.client.i
+    vpc.priv.k3s.tr -> vpc.priv.k3s.utw.server.i
+    vpc.priv.node -> vpc.priv.k3s.fx { style.stroke-dash: 4; style.stroke: "#8250df" }
+    acm -> vpc.pub.alb: TLS { style.stroke-dash: 4 }
+    vpc.priv.node -> id.b: JWKS { style.stroke-dash: 2 }
+    vpc.priv.k3s.utw.server.a -> id.p: IRSA { style.stroke-dash: 2; style.stroke: "#bc4c00" }
+    vpc.priv.k3s.eso -> id.p: IRSA { style.stroke-dash: 2; style.stroke: "#bc4c00" }
+  }
+}
+
+foot: "" {
+  grid-columns: 4
+  style.stroke: transparent
+
+  flow: Request flow  (end to end) {
+    style.font-size: 30
+    direction: right
+    style.stroke: "#1f6feb"
+    u: Visitor { shape: image; icon: ./icons/users.png }
+    d: Cloudflare DNS { shape: image; icon: ./icons/cloudflare.png }
+    l: ALB { shape: image; icon: ./icons/alb.png }
+    n: Node { shape: image; icon: ./icons/ec2.png }
+    t: Traefik { shape: image; icon: ./icons/traefik.png }
+    i: Ingress { shape: image; icon: ./icons/ing.png }
+    s: Service { shape: image; icon: ./icons/svc.png }
+    p: Pod { shape: image; icon: ./icons/pod.png }
+    u -> d -> l -> n -> t -> i -> s -> p
+  }
+
+  obs: Observability  ·  namespace monitoring {
+    style.font-size: 30
+    direction: right
+    style.stroke: "#bc4c00"
+    w: node + pods { shape: image; icon: ./icons/pod.png }
+    p: Prometheus { shape: image; icon: ./icons/prometheus.png }
+    g: Grafana { shape: image; icon: ./icons/grafana.png }
+    h: grafana.<domain> { shape: image; icon: ./icons/users.png }
+    w -> p: scrape { style.stroke: "#bc4c00" }
+    p -> g: query { style.stroke: "#bc4c00" }
+    g -> h: Traefik ingress { style.stroke: "#bc4c00" }
+  }
+
+  secrets: Secrets  ·  external-secrets {
+    style.font-size: 30
+    direction: right
+    style.stroke: "#bc4c00"
+    ps: Parameter Store { shape: image; icon: ./icons/ssm.png }
+    cs: ClusterSecretStore  aws-parameterstore { shape: image; icon: ./icons/sa.png }
+    es: ExternalSecret { shape: image; icon: ./icons/secret.png }
+    k: Kubernetes Secret { shape: image; icon: ./icons/secret.png }
+    ps -> cs: IRSA jwt { style.stroke: "#bc4c00" }
+    cs -> es { style.stroke: "#bc4c00" }
+    es -> k { style.stroke: "#bc4c00" }
+  }
+
+  notify: Notifications {
+    style.font-size: 30
+    direction: right
+    style.stroke: "#8250df"
+    fl: Flux { shape: image; icon: ./icons/flux.png }
+    al: Alert + Provider { shape: image; icon: ./icons/flux.png }
+    dc: Discord { shape: image; icon: ./icons/discord.png }
+    fl -> al: reconcile events { style.stroke: "#8250df" }
+    al -> dc { style.stroke: "#8250df" }
+  }
+
+  life: Ephemeral  ·  rebuilt every day {
+    style.font-size: 30
+    direction: right
+    style.stroke: "#57606a"
+    a: terraform apply { shape: image; icon: ./icons/terraform.png }
+    b: cluster live { shape: image; icon: ./icons/k8s.png }
+    c: terraform destroy { shape: image; icon: ./icons/terraform.png }
+    a -> b: morning { style.stroke: "#57606a" }
+    b -> c: night { style.stroke: "#57606a" }
+    c -> a: nothing is clicked { style.stroke: "#57606a"; style.stroke-dash: 4 }
+  }
+
+  legend: Legend {
+    style.font-size: 30
+    grid-rows: 3
+    a: "────  request path" { style.font-size: 20; style.stroke: "#1f6feb"; style.font-color: "#1f6feb" }
+    b: "╌╌╌╌  control plane" { style.font-size: 20; style.stroke: "#8250df"; style.font-color: "#8250df" }
+    c: "┈┈┈┈  identity (IRSA)" { style.font-size: 20; style.stroke: "#bc4c00"; style.font-color: "#bc4c00" }
+  }
+}

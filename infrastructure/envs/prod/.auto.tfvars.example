@@ -1,0 +1,25 @@
+// AWS
+project                     = "utw"
+profile                     = "personal"
+environment                 = "prod"
+region                      = "eu-central-1"
+control_plane_instance_type = "m7i-flex.large"
+
+// Cloudflare
+domain               = "..."
+cloudflare_zone_id   = "..."
+cloudflare_api_token = "..."
+
+// Github
+github_token          = "..."
+github_packages_token = "..."
+repo_owner            = "..."
+repo_name             = "..."
+branch                = "master"
+
+// Discord
+discord_webhook = "..."
+
+// Grafana
+grafana_name     = "..."
+grafana_password = "..."

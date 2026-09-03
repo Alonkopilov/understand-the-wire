@@ -41,7 +41,7 @@ export function FluxZone({
       <SectionHeading
         eyebrow="03 — Reconciliation"
         title="What the cluster thinks it should be"
-        lede="Nothing here was applied by hand. Flux pulls the repository and applied everything to the cluster - push a commit and this revision changes within a minute."
+        lede="Nothing here was applied by hand. Flux pulls the repository and applies everything to the cluster - push a commit and this revision changes within a minute."
       />
 
       <div className="split">
