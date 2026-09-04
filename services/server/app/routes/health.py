@@ -1,7 +1,4 @@
-from fastapi import APIRouter
-from kubernetes.aio import client, config
-from kubernetes.aio.client.api_client import ApiClient
-from datetime import datetime, timezone
+from fastapi import APIRouter, Response
 import os, time
 
 
@@ -14,7 +11,10 @@ router = APIRouter()
 
 
 @router.get("/api/health")
-async def health():
+async def health(response: Response):
+    # The backend is down? - return a cached version for 24 hours
+    response.headers["Cache-Control"] = "public, max-age=60, stale-if-error=86400"
+
     return {
         "status": "Ready",
         "version": VERSION,
