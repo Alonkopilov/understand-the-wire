@@ -4,8 +4,5 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5"
     }
-    local = {
-      source = "hashicorp/local"
-    }
   }
 }

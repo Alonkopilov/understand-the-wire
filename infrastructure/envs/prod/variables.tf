@@ -38,10 +38,6 @@ variable "cloudflare_zone_id" {
   sensitive = true
 }
 
-variable "cloudflare_account_id" {
-  type = string
-}
-
 variable "domain" {
   type = string
 }

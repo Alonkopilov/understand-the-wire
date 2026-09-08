@@ -84,7 +84,6 @@ module "cloudflare_dns" {
   zone_id            = var.cloudflare_zone_id
   alb_dns_name       = module.alb.alb_dns_name
   validation_records = module.acm.validation_records
-  account_id         = var.cloudflare_account_id
 }
 
 # Makes terraform wait for the certificate to be validated.

@@ -31,13 +31,3 @@ resource "cloudflare_dns_record" "alb_grafana" {
   proxied = false
   ttl     = 60
 }
-
-resource "cloudflare_workers_custom_domain" "name" {
-  account_id = var.account_id
-  zone_id    = var.zone_id
-
-  hostname = "www.${var.domain}"
-  service  = cloudflare_worker.proxy.name
-
-  depends_on = [cloudflare_workers_deployment.proxy]
-}

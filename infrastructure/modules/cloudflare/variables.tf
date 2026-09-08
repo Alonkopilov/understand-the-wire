@@ -15,7 +15,3 @@ variable "validation_records" {
 variable "domain" {
   type = string
 }
-
-variable "account_id" {
-  type = string
-}
