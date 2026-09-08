@@ -4,39 +4,8 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5"
     }
+    local = {
+      source = "hashicorp/local"
+    }
   }
-}
-
-resource "cloudflare_dns_record" "validation" {
-  for_each = {
-    for dvo in var.validation_records :
-    dvo.domain_name => dvo
-  }
-
-  zone_id = var.zone_id
-
-  name    = each.value.resource_record_name
-  type    = each.value.resource_record_type
-  content = each.value.resource_record_value
-  ttl     = 60
-}
-
-resource "cloudflare_dns_record" "alb" {
-  zone_id = var.zone_id
-
-  name    = "www.${var.domain}"
-  type    = "CNAME"
-  content = var.alb_dns_name
-  proxied = false
-  ttl     = 60
-}
-
-resource "cloudflare_dns_record" "alb_grafana" {
-  zone_id = var.zone_id
-
-  name    = "grafana.${var.domain}"
-  type    = "CNAME"
-  content = var.alb_dns_name
-  proxied = false
-  ttl     = 60
 }
