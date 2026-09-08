@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: www.${domain}
+  - host: origin.${domain}
     http:
       paths:
       - pathType: Prefix
