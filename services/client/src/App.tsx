@@ -16,6 +16,7 @@ import { MapZone } from "./components/MapZone.tsx";
 import { ProblemsZone } from "./components/ProblemsZone.tsx";
 import { TraceZone } from "./components/TraceZone.tsx";
 import { Hero } from "./components/Hero.tsx";
+import { SnapshotNotice } from "./components/SnapshotNotice.tsx";
 import "./App.css";
 
 const REPO_URL = "https://github.com/Alonkopilov/understand-the-wire";
@@ -54,6 +55,8 @@ function App() {
 
   return (
     <>
+      <SnapshotNotice sources={[health, trace, cluster, flux, aws]} />
+
       <header className="masthead">
         <div className="masthead-top">
           <p className="wordmark">understand&#8203;-the&#8203;-wire</p>

@@ -1,4 +1,10 @@
 /**
+ * Written by the nightly workflow next to the captured endpoint responses, so
+ * the snapshot can say exactly when it was taken instead of guessing.
+ */
+export type SnapshotMeta = { capturedAt: string };
+
+/**
  * The contract between this client and the Python API.
  *
  * Every endpoint is optional at runtime: if it is missing, slow, or broken the

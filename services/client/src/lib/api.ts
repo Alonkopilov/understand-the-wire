@@ -14,12 +14,36 @@ export function apiUrl(path: string): string {
 }
 
 /**
- * Fetch JSON, treating every failure mode the same way: a thrown Error whose
- * message is safe to show a visitor. Callers turn that into a degraded panel
- * rather than a broken page.
+ * Endpoints the nightly workflow captures before `terraform destroy`, written
+ * into the static build as `/snapshot/<name>.json`.
+ *
+ * `/source` is deliberately absent: it takes a `?path=` argument, so there is
+ * no fixed set of responses to capture. Its panel degrades to "unavailable",
+ * which is already how it behaves when the backend is missing.
+ */
+const SNAPSHOT_FILES: Record<string, string> = {
+  "/health": "health",
+  "/trace": "trace",
+  "/cluster": "cluster",
+  "/flux": "flux",
+  "/aws": "aws",
+};
+
+export const SNAPSHOT_META_URL = "/snapshot/meta.json";
+
+/** The captured copy of an endpoint, or null if that endpoint is not captured. */
+export function snapshotUrl(path: string): string | null {
+  const name = SNAPSHOT_FILES[path];
+  return name ? `/snapshot/${name}.json` : null;
+}
+
+/**
+ * Fetch JSON from a URL, treating every failure mode the same way: a thrown
+ * Error whose message is safe to show a visitor. Callers turn that into a
+ * degraded panel rather than a broken page.
  */
 export async function getJson<T>(
-  path: string,
+  url: string,
   signal?: AbortSignal,
 ): Promise<T> {
   const controller = new AbortController();
@@ -29,7 +53,7 @@ export async function getJson<T>(
   signal?.addEventListener("abort", onAbort);
 
   try {
-    const response = await fetch(apiUrl(path), {
+    const response = await fetch(url, {
       signal: controller.signal,
       headers: { accept: "application/json" },
     });
@@ -40,7 +64,8 @@ export async function getJson<T>(
 
     const contentType = response.headers.get("content-type") ?? "";
     if (!contentType.includes("json")) {
-      // Usually nginx's own 404 page — the endpoint isn't wired up yet.
+      // nginx's own 404 page, or S3's XML when the static build is being served
+      // and nothing is behind /api. Either way there is no endpoint here.
       throw new Error("endpoint not available");
     }
 
