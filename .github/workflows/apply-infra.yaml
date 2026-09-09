@@ -1,0 +1,20 @@
+name: Destory Infrastructure and Publish Snapshot
+
+on:
+  workflow_dispatch:
+
+env:
+  ACCOUNT_ID: "744092294111"
+
+jobs:
+  publish-snapshot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/github-actions-role
+          aws-region: eu-central-1

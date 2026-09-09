@@ -1,10 +1,10 @@
 provider "aws" {
-  region  = "eu-central-1"
-  profile = "personal"
+  region  = var.region
+  profile = var.profile
   default_tags {
     tags = {
       managed_by  = "Terraform"
-      environment = "Global"
+      environment = var.environment
     }
   }
 }
@@ -12,5 +12,3 @@ provider "aws" {
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
-
-provider "local" {}
