@@ -17,6 +17,10 @@ spec:
   providerRef:
     name: discord
   eventSeverity: info
+  eventMetadata:
+    environment: ${environment}
+    branch: ${branch}
+    region: ${aws_region}
   eventSources:
     - kind: Kustomization
       name: '*'
