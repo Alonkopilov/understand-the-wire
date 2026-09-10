@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "this" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:Alonkopilov/understand-the-wire"]
+      values   = ["repo:Alonkopilov/understand-the-wire:ref:refs/heads/${var.branch}"]
     }
 
     condition {
@@ -30,6 +30,11 @@ resource "aws_iam_role" "this" {
 resource "aws_iam_policy" "this" {
   name   = "${var.name}-policy"
   policy = var.policy
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.this.name
+  policy_arn = aws_iam_policy.this.arn
 }
 
 data "tls_certificate" "this" {

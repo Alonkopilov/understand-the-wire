@@ -108,7 +108,8 @@ module "alb" {
 module "github_actions" {
   source = "../../modules/oidc-github"
 
-  name = "github-actions"
+  name   = "github-actions"
+  branch = var.branch
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
