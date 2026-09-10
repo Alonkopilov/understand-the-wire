@@ -104,6 +104,35 @@ module "alb" {
   }
 }
 
+# Github Actions OIDC
+module "github_actions" {
+  source = "../../modules/oidc-github"
+
+  name = "github-actions"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "*",
+        Resource = "*",
+      },
+      {
+        Effect = "Deny",
+        Action = [
+          "iam:CreateUser",
+          "iam:CreateAccessKey",
+          "iam:AttachUserPolicy",
+          "iam:PutUserPolicy",
+          "organizations:*",
+          "account:*"
+        ],
+        Resource = "*",
+      },
+    ]
+  })
+}
+
 # Service accounts
 module "external_secrets_sa" {
   source      = "../../modules/service-account"
@@ -171,3 +200,4 @@ module "server_sa" {
   oidc_provider_arn    = module.cluster_oidc_issuer_bucket.oidc_provider_arn
   oidc_provider_domain = module.cluster_oidc_issuer_bucket.oidc_provider_domain
 }
+
