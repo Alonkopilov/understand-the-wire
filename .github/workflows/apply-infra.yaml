@@ -29,17 +29,27 @@ jobs:
         with:
           terraform_version: "1.16.1"
 
+      - name: Fetch Secrets from AWS SSM Parameter Store
+        run: |
+          TOKEN=$(aws ssm get-parameter \
+            --name "/utw/global/cloudflare/api-token" \
+            --with-decryption \
+            --query "Parameter.Value" \
+            --output text)
+          echo "::add-mask::$TOKEN"
+          echo "TF_VAR_cloudflare_api_token=$TOKEN" >> "$GITHUB_ENV"
+
       - name: Apply Bootstrap
         run: |
           cd $GITHUB_WORKSPACE/infrastructure/bootstrap/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
-          terraform plan
+          terraform plan -input=false
 
       - name: Apply Environment
         run: |
           cd $GITHUB_WORKSPACE/infrastructure/environments/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
-          terraform plan
+          terraform plan -input=false
           
