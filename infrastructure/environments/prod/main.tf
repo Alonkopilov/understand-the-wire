@@ -110,6 +110,9 @@ module "github_actions" {
 
   name   = "github-actions"
   branch = var.branch
+  owner  = var.repo_owner
+  repo   = var.repo_name
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

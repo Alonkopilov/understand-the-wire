@@ -9,3 +9,11 @@ variable "policy" {
 variable "branch" {
   type = string
 }
+
+variable "repo" {
+  type = string
+}
+
+variable "owner" {
+  type = string
+}

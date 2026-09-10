@@ -4,11 +4,11 @@ data "aws_iam_policy_document" "this" {
     effect  = "Allow"
 
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:Alonkopilov/understand-the-wire:ref:refs/heads/${var.branch}"]
+      values   = ["repo:${var.owner}@*/${var.repo}@*:ref:refs/heads/${var.branch}"]
     }
-
+    # repo:Alonkopilov@68990342/understand-the-wire@1305674153:ref:refs/heads/master
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:aud"
