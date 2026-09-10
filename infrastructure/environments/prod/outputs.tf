@@ -6,7 +6,3 @@ output "aws_account" {
 output "name_prefix" {
   value = local.name_prefix
 }
-
-output "parameter_name_prefix" {
-  value = local.parameter_name_prefix
-}
