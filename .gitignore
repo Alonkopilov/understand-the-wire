@@ -7,7 +7,7 @@ crash.*.log
 
 # .tfvars hold tokens and per-environment values. Note .terraform.lock.hcl is
 # NOT ignored — it pins provider versions and belongs in version control.
-*.tfvars
+.auto.tfvars
 *.tfvars.json
 
 # Local override files, used for experiments that should not be committed.
