@@ -26,7 +26,7 @@ function App() {
   const trace = useResource<Trace>("/trace");
   const cluster = useResource<Cluster>("/cluster", 60000);
   const flux = useResource<Flux>("/flux", 60000);
-  const aws = useResource<Aws>("/aws", 60000);
+  const aws = useResource<Aws>("/aws", 120000);
 
   const live = useMemo<LiveContext>(
     () => ({
