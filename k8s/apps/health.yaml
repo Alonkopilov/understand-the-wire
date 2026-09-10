@@ -11,6 +11,6 @@ spec:
         pathType: Exact
         backend:
           service:
-            name: server-service
+            name: client-service
             port:
-              number: 8000
+              number: 80
