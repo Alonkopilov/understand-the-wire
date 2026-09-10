@@ -5,6 +5,5 @@ terraform {
     use_lockfile = true
     encrypt      = true
     region       = "eu-central-1"
-    profile      = "personal"
   }
 }
