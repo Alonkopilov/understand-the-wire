@@ -16,10 +16,6 @@ variable "cloudflare_api_token" {
   sensitive = true
 }
 
-variable "profile" {
-  type = string
-}
-
 variable "region" {
   type = string
 }
