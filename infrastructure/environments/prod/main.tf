@@ -1,7 +1,6 @@
 locals {
-  name_prefix           = "${var.project}-${var.environment}"
-  parameter_name_prefix = "/${var.project}/${var.environment}"
-  env_domain            = var.environment == "prod" ? var.domain : "${var.environment}.${var.domain}"
+  name_prefix = "${var.project}-${var.environment}"
+  env_domain  = var.environment == "prod" ? var.domain : "${var.environment}.${var.domain}"
 }
 
 # Constructs a VPC, private and public subnets, internet gateway and routing.
@@ -30,30 +29,25 @@ module "cluster_oidc_issuer_bucket" {
   name = "${local.name_prefix}-oidc-bucket"
 }
 
-# Constructs secrets in parameter store.
-module "parameter_store" {
-  source      = "../../modules/parameter-store"
-  name_prefix = local.parameter_name_prefix
-
-  github_token          = var.github_token
-  discord_webhook       = var.discord_webhook
-  grafana_name          = var.grafana_name
-  grafana_password      = var.grafana_password
-  github_packages_token = var.github_packages_token
-}
-
 # Constructs an EC2 K3S control plane node - sets up the cluster with Flux connected
 # to the Github repo, custom OIDC issuer in S3 and VPC Endpoints to communicate with
 # AWS SSM Session Manager.
+data "aws_ssm_parameter" "github_token" {
+  name = "/${var.project}/global/github/token"
+}
+
+data "aws_ssm_parameter" "discord_webhook" {
+  name = "/${var.project}/${var.environment}/discord/webhook"
+}
+
 module "control_plane_node" {
   source      = "../../modules/control-plane-node"
   name_prefix = local.name_prefix
-
-  parameter_store_secrets_arn = {
-    discord_webhook = module.parameter_store.discord_webhook_arn,
-    github_token    = module.parameter_store.github_token_arn
-  }
   oidc_bucket = module.cluster_oidc_issuer_bucket.bucket
+  parameter_store_secrets_arn = {
+    discord_webhook = data.aws_ssm_parameter.discord_webhook.arn
+    github_token    = data.aws_ssm_parameter.github_token.arn
+  }
   git_repository = {
     name   = var.repo_name
     owner  = var.repo_owner
@@ -77,11 +71,14 @@ module "acm" {
 
 # Creates the DNS records for my domain + the validation records to verify the
 # certificate created in AWS ACM
+data "aws_ssm_parameter" "cloudflare_zone_id" {
+  name = "/${var.project}/global/cloudflare/zone-id"
+}
 module "cloudflare_dns" {
   source = "../../modules/cloudflare"
 
   domain             = local.env_domain
-  zone_id            = var.cloudflare_zone_id
+  zone_id            = data.aws_ssm_parameter.cloudflare_zone_id.value
   alb_dns_name       = module.alb.alb_dns_name
   validation_records = module.acm.validation_records
 }

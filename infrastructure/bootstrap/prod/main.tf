@@ -12,11 +12,13 @@ module "snapshot_bucket_prod" {
 }
 
 data "aws_ssm_parameter" "cloudflare_zone_id" {
-  name = module.secrets_store.global["cloudflare_zone_id"]
+  name       = module.secrets_store.secrets["cloudflare-zone-id"]
+  depends_on = [module.secrets_store]
 }
 
 data "aws_ssm_parameter" "cloudflare_account_id" {
-  name = module.secrets_store.global["cloudflare_account_id"]
+  name       = module.secrets_store.secrets["cloudflare-account-id"]
+  depends_on = [module.secrets_store]
 }
 
 module "proxy_worker" {
