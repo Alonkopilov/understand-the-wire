@@ -8,7 +8,7 @@ export default {
     // Request the live website
     try {
         const live = await fetch(ORIGIN + url.pathname + url.search, request);
-        if (live.status < 500) {
+        if (live.status < 500 && live.status != 404) {
             return live
         }
     } catch {}
