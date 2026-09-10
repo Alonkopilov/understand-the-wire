@@ -22,10 +22,10 @@ import "./App.css";
 const REPO_URL = "https://github.com/Alonkopilov/understand-the-wire";
 
 function App() {
-  const health = useResource<Health>("/health", 15000);
+  const health = useResource<Health>("/health", 60000);
   const trace = useResource<Trace>("/trace");
-  const cluster = useResource<Cluster>("/cluster", 15000);
-  const flux = useResource<Flux>("/flux", 20000);
+  const cluster = useResource<Cluster>("/cluster", 60000);
+  const flux = useResource<Flux>("/flux", 60000);
   const aws = useResource<Aws>("/aws", 60000);
 
   const live = useMemo<LiveContext>(
