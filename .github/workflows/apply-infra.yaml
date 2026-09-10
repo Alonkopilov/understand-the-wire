@@ -6,6 +6,7 @@ on:
 env:
   ACCOUNT_ID: "744092294111"
   REGION: eu-central-1
+  ENVIRONMENT: prod
 
 jobs:
   apply-infrastructure:
@@ -14,8 +15,31 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/github-actions-role
           aws-region: ${{ env.REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.16.1"
+
+      - name: Apply Bootstrap
+        run: |
+          cd $GITHUB_WORKSPACE/infrastructure/bootstrap/${{ env.ENVIRONMENT }}
+          terraform init
+          terraform validate
+          terraform plan
+
+      - name: Apply Environment
+        run: |
+          cd $GITHUB_WORKSPACE/infrastructure/environments/${{ env.ENVIRONMENT }}
+          terraform init
+          terraform validate
+          terraform plan
+          
