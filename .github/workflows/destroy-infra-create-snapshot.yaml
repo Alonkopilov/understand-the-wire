@@ -21,6 +21,7 @@ jobs:
 
       - name: Build client assets
         run: |
+          cd services/client/
           npm run build
 
       - name: Request data for snapshot
