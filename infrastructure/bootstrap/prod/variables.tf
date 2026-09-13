@@ -18,3 +18,15 @@ variable "project" {
 variable "environment" {
   type = string
 }
+
+variable "repo_owner" {
+  type = string
+}
+
+variable "repo_name" {
+  type = string
+}
+
+variable "branch" {
+  type = string
+}
