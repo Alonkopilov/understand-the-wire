@@ -1,0 +1,78 @@
+name: Apply Infrastructure
+
+on:
+  workflow_dispatch:
+
+env:
+  ACCOUNT_ID: "744092294111"
+  REGION: eu-central-1
+  ENVIRONMENT: prod
+  BUCKET_NAME: alonko-utw-snapshot-bucket-prod
+
+jobs:
+  create-snapshot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Build client assets
+        run: |
+          npm run build
+
+      - name: Request data for snapshot
+        run: |
+          mkdir -p dist/snapshot
+          for e in health trace cluster flux aws; do
+            curl -fsS "https://www.understand-the-wire.com/api/$e" -o "dist/snapshot/$e.json"
+          done
+          printf '{"capturedAt":"%s"}' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > dist/snapshot/meta.json
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.REGION }}
+
+      - name: Upload assets and data to bucket
+        run: |
+          aws s3 sync "dist/" "s3://${{ env.BUCKET_NAME }}/" --delete
+
+  destroy-infrastructure:
+    needs: create-snapshot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.16.1"
+
+      - name: Fetch Secrets from AWS SSM Parameter Store
+        run: |
+          TOKEN=$(aws ssm get-parameter \
+            --name "/utw/global/cloudflare/api-token" \
+            --with-decryption \
+            --query "Parameter.Value" \
+            --output text)
+          echo "::add-mask::$TOKEN"
+          echo "TF_VAR_cloudflare_api_token=$TOKEN" >> "$GITHUB_ENV"
+
+      - name: Destroy Environment
+        run: |
+          cd $GITHUB_WORKSPACE/infrastructure/environments/${{ env.ENVIRONMENT }}
+          terraform init
+          terraform validate
+          terraform plan -input=false
+          
