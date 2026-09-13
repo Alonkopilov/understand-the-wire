@@ -1,4 +1,4 @@
-name: Apply Infrastructure
+name: Create Snapshot and Destroy Infrastructure
 
 on:
   workflow_dispatch:
