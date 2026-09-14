@@ -44,12 +44,12 @@ jobs:
           cd $GITHUB_WORKSPACE/infrastructure/bootstrap/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
-          terraform plan -input=false
+          terraform apply -auto-approve -input=false
 
       - name: Apply Environment
         run: |
           cd $GITHUB_WORKSPACE/infrastructure/environments/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
-          terraform plan -input=false
+          terraform apply -auto-approve -input=false
           
