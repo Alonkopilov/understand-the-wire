@@ -20,12 +20,13 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Build client assets
+        working-directory: services/client
         run: |
-          cd services/client/
           npm ci
           npm run build
 
       - name: Request data for snapshot
+        working-directory: services/client
         run: |
           mkdir -p dist/snapshot
           for e in health trace cluster flux aws; do
@@ -40,6 +41,7 @@ jobs:
           aws-region: ${{ env.REGION }}
 
       - name: Upload assets and data to bucket
+        working-directory: services/client
         run: |
           aws s3 sync "dist/" "s3://${{ env.BUCKET_NAME }}/" --delete
 
@@ -73,7 +75,7 @@ jobs:
 
       - name: Destroy Environment
         run: |
-          cd $GITHUB_WORKSPACE/infrastructure/environments/${{ env.ENVIRONMENT }}
+          cd infrastructure/environments/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
           terraform plan -input=false
