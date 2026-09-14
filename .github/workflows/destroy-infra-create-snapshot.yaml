@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-        
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -81,5 +81,5 @@ jobs:
           cd infrastructure/environments/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
-          terraform plan -input=false
+          terraform destroy -auto-approve
           
