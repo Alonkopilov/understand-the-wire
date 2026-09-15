@@ -23,11 +23,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/github-actions-role
           aws-region: ${{ env.REGION }}
-      
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
-        with:
-          terraform_version: "1.16.1"
 
       - name: Fetch Secrets from AWS SSM Parameter Store
         run: |
@@ -38,17 +33,15 @@ jobs:
             --output text)
           echo "::add-mask::$TOKEN"
           echo "TF_VAR_cloudflare_api_token=$TOKEN" >> "$GITHUB_ENV"
-
-      - name: Apply Bootstrap
-        run: |
-          cd $GITHUB_WORKSPACE/infrastructure/bootstrap/${{ env.ENVIRONMENT }}
-          terraform init
-          terraform validate
-          terraform apply -auto-approve -input=false
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.16.1"
 
       - name: Apply Environment
+        working-directory: infrastructure/environments/${{ env.ENVIRONMENT }}
         run: |
-          cd $GITHUB_WORKSPACE/infrastructure/environments/${{ env.ENVIRONMENT }}
           terraform init
           terraform validate
           terraform apply -auto-approve -input=false
