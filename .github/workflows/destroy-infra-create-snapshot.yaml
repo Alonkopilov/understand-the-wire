@@ -47,6 +47,7 @@ jobs:
 
   destroy-infrastructure:
     needs: create-snapshot
+    if: always()  # If the snapshot creation job failed, prioritize preventing additional billing over an updated snapshot
     runs-on: ubuntu-latest
     permissions:
       contents: read
